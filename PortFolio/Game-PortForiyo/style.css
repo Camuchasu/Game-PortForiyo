@@ -1,0 +1,245 @@
+/* ベースリセット */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    /* 深いインディゴからコーラル・パープルへの温かい夜空グラデーション */
+    background: linear-gradient(135deg, #1B1B3A 0%, #2D2342 50%, #4A304D 100%);
+    color: #FDFBF7; /* 温かみのあるオフホワイト */
+    font-family: 'Quicksand', 'Noto Sans JP', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Canvas背景（一番奥） */
+canvas#starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none; /* クリックイベントを透過 */
+}
+
+/* ページ全体のラッパー（コンテンツを中央に保つため） */
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ヘッダー（グラスモーフィズム） */
+.glass-header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.15); /* ほんのり金色のボーダー */
+    z-index: 100;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.highlight {
+    color: #FFD700; /* ゴールド */
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #FDFBF7;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.glow-link:hover {
+    color: #FFD700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+}
+
+/* セクションの共通スタイル */
+main {
+    flex: 1;
+    padding: 0 50px;
+}
+
+section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 0;
+}
+
+/* ヒーローセクション */
+.hero {
+    height: calc(100vh - 80px); /* ヘッダー分を引く */
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, #FFF, #FFD700, #FF9E80);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 40px;
+    color: #E2DFD8;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1B1B3A;
+    background: linear-gradient(135deg, #FFD700, #FF9E80);
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+    background: linear-gradient(135deg, #FFF, #FFD700);
+}
+
+/* その他のセクション（グラスモーフィズムパネル） */
+.placeholder-section {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 50px auto;
+    padding: 60px;
+    border-radius: 20px;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05); /* ほんのり白く */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 215, 0, 0.2); /* 金色の縁切り */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+/* カードグリッド */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: 15px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 215, 0, 0.05);
+    box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+.card-image-placeholder {
+    width: 100%;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+/* スキルタグ */
+.skills-flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.skill-tag {
+    padding: 10px 20px;
+    background: rgba(255, 215, 0, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 20px;
+    font-weight: 500;
+    color: #FDFBF7;
+    transition: all 0.3s ease;
+}
+
+.skill-tag:hover {
+    background: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+/* フッター */
+.glass-footer {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 215, 0, 0.1);
+    font-size: 0.9rem;
+    color: #E2DFD8;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .glass-header {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .placeholder-section {
+        padding: 40px 20px;
+    }
+}

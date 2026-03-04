@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fontsのインポート -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+JP:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Game Portfolio - Prototype</title>
+</head>
+<body>
+    <!-- 背景用のCanvas -->
+    <canvas id="starfield"></canvas>
+
+    <div class="content-wrapper">
+        <header class="glass-header">
+            <h1 class="logo glow">GAMER<span class="highlight">PORTFOLIO</span></h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#about" class="glow-link">ABOUT</a></li>
+                    <li><a href="#works" class="glow-link">WORKS</a></li>
+                    <li><a href="#skills" class="glow-link">SKILLS</a></li>
+                    <li><a href="#contact" class="glow-link">CONTACT</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <!-- ヒーローセクション（トップ画面） -->
+            <section class="hero">
+                <h2 class="hero-title glow">Welcome to My World</h2>
+                <p class="hero-subtitle">Creating experiences beyond imagination.</p>
+                <a href="#works" class="btn-primary glow-button">VIEW MY WORKS</a>
+            </section>
+
+            <!-- 1, 3, 4は未定のため、プレースホルダーとして配置 -->
+            <section id="about" class="placeholder-section glass-panel">
+                <h3 class="section-title glow">ABOUT ME</h3>
+                <p>プロフィール情報をここに記載します。（後から追加予定）</p>
+            </section>
+
+            <section id="works" class="placeholder-section glass-panel">
+                <h3 class="section-title glow">GAMES & WORKS</h3>
+                <p>作品一覧をここに並べます。数や見せ方は後から決定します。</p>
+                <!-- カードのプレースホルダー -->
+                <div class="card-grid">
+                    <div class="card glass-card">
+                        <div class="card-image-placeholder"></div>
+                        <h4>Game Title 1</h4>
+                        <p>Description goes here...</p>
+                    </div>
+                    <div class="card glass-card">
+                        <div class="card-image-placeholder"></div>
+                        <h4>Game Title 2</h4>
+                        <p>Description goes here...</p>
+                    </div>
+                    <div class="card glass-card">
+                        <div class="card-image-placeholder"></div>
+                        <h4>Game Title 3</h4>
+                        <p>Description goes here...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="skills" class="placeholder-section glass-panel">
+                <h3 class="section-title glow">SKILLS</h3>
+                <p>使用可能な技術やツールをここに記載します。（後から追加予定）</p>
+                <div class="skills-flex">
+                    <span class="skill-tag glow-border">Unity</span>
+                    <span class="skill-tag glow-border">C#</span>
+                    <span class="skill-tag glow-border">HTML/CSS/JS</span>
+                </div>
+            </section>
+
+            <section id="contact" class="placeholder-section glass-panel">
+                <h3 class="section-title glow">CONTACT</h3>
+                <p>お問い合わせフォームやSNSリンクを配置します。（後から追加予定）</p>
+            </section>
+        </main>
+
+        <footer class="glass-footer">
+            <p>&copy; 2026 My Game Portfolio. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- JSファイルの読み込み -->
+    <script src="script.js"></script>
+</body>
+</html>
