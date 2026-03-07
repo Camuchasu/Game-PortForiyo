@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Fontsのインポート -->
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Noto+Sans+JP:wght@300;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Noto+Sans+JP:wght@300;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <title>Game Portfolio - Warm Starlight</title>
 </head>
+
 <body>
     <!-- 背景用のCanvas -->
     <canvas id="starfield"></canvas>
@@ -36,39 +40,61 @@
             <!-- 1, 3, 4は未定のため、プレースホルダーとして配置 -->
             <section id="about" class="placeholder-section glass-panel">
                 <h3 class="section-title glow">ABOUT ME</h3>
-                <p>プロフィール情報をここに記載します。（後から追加予定）</p>
+                <div class="about-content" id="about-container">
+                    <div class="about-media-container card-image-placeholder"></div>
+                    <div class="about-text-container">
+                        <h4 class="editable-text">Name / Title</h4>
+                        <p class="editable-text">プロフィールや自己紹介文をここに記載します。<br>得意なジャンルや開発への情熱などをアピールします。</p>
+                    </div>
+                </div>
             </section>
 
             <section id="works" class="placeholder-section glass-panel">
                 <h3 class="section-title glow">GAMES & WORKS</h3>
                 <p>作品一覧をここに並べます。数や見せ方は後から決定します。</p>
                 <!-- カードのプレースホルダー -->
-                <div class="card-grid">
+                <div class="card-grid" id="works-grid">
                     <div class="card glass-card">
-                        <div class="card-image-placeholder"></div>
-                        <h4>Game Title 1</h4>
-                        <p>Description goes here...</p>
+                        <div class="card-media-container card-image-placeholder"></div>
+                        <h4 class="editable-text">Game Title 1</h4>
+                        <p class="editable-text">Description goes here...</p>
                     </div>
                     <div class="card glass-card">
-                        <div class="card-image-placeholder"></div>
-                        <h4>Game Title 2</h4>
-                        <p>Description goes here...</p>
+                        <div class="card-media-container card-image-placeholder"></div>
+                        <h4 class="editable-text">Game Title 2</h4>
+                        <p class="editable-text">Description goes here...</p>
                     </div>
                     <div class="card glass-card">
-                        <div class="card-image-placeholder"></div>
-                        <h4>Game Title 3</h4>
-                        <p>Description goes here...</p>
+                        <div class="card-media-container card-image-placeholder"></div>
+                        <h4 class="editable-text">Game Title 3</h4>
+                        <p class="editable-text">Description goes here...</p>
                     </div>
                 </div>
             </section>
 
             <section id="skills" class="placeholder-section glass-panel">
                 <h3 class="section-title glow">SKILLS</h3>
-                <p>使用可能な技術やツールをここに記載します。（後から追加予定）</p>
-                <div class="skills-flex">
-                    <span class="skill-tag glow-border">Unity</span>
-                    <span class="skill-tag glow-border">C#</span>
-                    <span class="skill-tag glow-border">HTML/CSS/JS</span>
+                <p class="editable-text">自身のスキルを星座に見立てて配置します。<br>（編集モード：星をドラッグで移動、文字をクリックで書き換え可能）</p>
+                <div class="constellation-container" id="constellation-container">
+                    <!-- 線を描画するためのSVGキャンバス -->
+                    <svg class="constellation-svg" id="constellation-svg"></svg>
+
+                    <!-- デフォルトの星たち -->
+                    <div class="star-node" style="left: 20%; top: 30%;" data-star-id="1">
+                        <div class="star-point glow-border"></div>
+                        <div class="star-label editable-text">Unity</div>
+                        <div class="star-tooltip editable-text">ゲームエンジンの基本操作、C#スクリプト連携、UI構築、アニメーション制御などが可能です。</div>
+                    </div>
+                    <div class="star-node" style="left: 50%; top: 50%;" data-star-id="2">
+                        <div class="star-point glow-border"></div>
+                        <div class="star-label editable-text">C#</div>
+                        <div class="star-tooltip editable-text">オブジェクト指向設計、非同期処理、LINQなどを用いた堅牢なゲームロジック開発を行います。</div>
+                    </div>
+                    <div class="star-node" style="left: 80%; top: 40%;" data-star-id="3">
+                        <div class="star-point glow-border"></div>
+                        <div class="star-label editable-text">C++</div>
+                        <div class="star-tooltip editable-text">メモリ管理やポインタ操作を理解し、パフォーマンスが必要な部分の最適化を図ります。</div>
+                    </div>
                 </div>
             </section>
 
@@ -83,7 +109,19 @@
         </footer>
     </div>
 
+    <!-- 追加: 作品編集用のファイルセレクター -->
+    <input type="file" id="media-uploader" accept="image/*,video/*" style="display: none;">
+    <!-- 追加: 編集モード切替ボタン -->
+    <button id="edit-mode-btn" class="glow-button">✏️ 編集モードON</button>
+
+    <!-- 追加: 拡大・再生用のメディアモーダル -->
+    <div id="media-modal" class="media-modal">
+        <span id="modal-close-btn" class="modal-close-btn">&times;</span>
+        <div id="modal-body" class="modal-body"></div>
+    </div>
+
     <!-- JSファイルの読み込み -->
     <script src="script.js"></script>
 </body>
+
 </html>
