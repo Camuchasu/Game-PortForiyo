@@ -1,0 +1,13 @@
+# バックアップファイルはコミットしない
+*.bak
+
+# macOSのシステムファイル
+.DS_Store
+*.swp
+
+# エディタのキャッシュや設定
+.vscode/
+
+# 動画や画像の元データ用（未公開・大容量ファイル）などを退避させるためのフォルダ
+PortFolio/Game-PortForiyo/private_assets/
+PortFolio/Game-PortForiyo/raw_materials/
