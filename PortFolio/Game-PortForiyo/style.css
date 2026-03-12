@@ -266,6 +266,37 @@ section {
     /* 星をマスの中央に配置 */
 }
 
+/* 一番下の特大星カード（代表作）をフル幅の独自行にするための設定 */
+.card-grid .masterpiece-card {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 800px;
+    /* 上部に大きな余白（150px）を強制的に追加して、他の作品群から大きく下へ引き剥がす */
+    margin: 150px auto 0 auto !important;
+    position: relative;
+}
+
+/* 上部に「特別な領域」を示す仕切り線を光として追加 */
+.card-grid .masterpiece-card::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    /* 編集モード時のマウス干渉を防ぐ */
+    pointer-events: none;
+}
+
+/* 代表作の中身のレイアウト */
+.masterpiece-content-wrap {
+    width: 100%;
+    padding: 10px 0;
+}
+
 /* --- 星化アニメーション機構 --- */
 
 /* 通常時：星の姿（編集モード外） */
@@ -297,6 +328,36 @@ body:not(.editing) .card-grid .glass-card:nth-child(2) {
 
 body:not(.editing) .card-grid .glass-card:nth-child(3) {
     animation-delay: 0.8s;
+}
+
+/* ==================================
+   代表作（マスターピース）用の特大星カード
+================================== */
+body:not(.editing) .masterpiece-card {
+    /* 通常の星カード（40px）より2倍大きいサイズに上書き */
+    width: 100px;
+    height: 100px;
+    /* 中心を白く飛ばし、周囲へ強いゴールドを放ち神々しさを演出 */
+    background: radial-gradient(circle, #FFFFFF 20%, #FFD700 80%);
+    box-shadow: 0 0 20px #FFF, 0 0 50px rgba(255, 215, 0, 1), 0 0 100px rgba(255, 215, 0, 0.6);
+    /* 独自のゆっくりした強い瞬きを付与 */
+    animation: masterpiece-twinkle 6s ease-in-out infinite;
+}
+
+/* 代表作専用の星の瞬き（より強く大きく変動） */
+@keyframes masterpiece-twinkle {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1.0);
+        box-shadow: 0 0 20px #FFF, 0 0 50px rgba(255, 215, 0, 1), 0 0 80px rgba(255, 215, 0, 0.6);
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.1);
+        box-shadow: 0 0 30px #FFF, 0 0 70px rgba(255, 215, 0, 1), 0 0 120px rgba(255, 215, 0, 0.8);
+        background: radial-gradient(circle, #FFFFFF 40%, #FFD700 80%);
+    }
 }
 
 /* --- 追加: 星のアニメーション定義 --- */
@@ -352,6 +413,54 @@ body:not(.editing) .glass-card:hover {
     animation: none;
 }
 
+/* 代表作のカード展開時の専用スタイル（高さを広めにとる） */
+body:not(.editing) .masterpiece-card:hover {
+    height: auto;
+    min-height: 480px;
+    background: rgba(11, 29, 66, 0.3);
+    /* 少し暗くしてリッチ感を出す */
+    border: 2px solid rgba(255, 215, 0, 0.8);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.card-media-container {
+    width: 100%;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 代表作専用の動画・画像エリアの拡張設定 */
+body:not(.editing) .masterpiece-card:hover .card-media-container,
+.editing .masterpiece-card .card-media-container {
+    height: auto;
+    aspect-ratio: 16 / 9;
+    /* 16:9の標準的なゲーム動画の比率を維持し、全体が見えるよう高さを自動拡張 */
+    width: 100%;
+}
+
+/* メディア（動画・画像）自体がコンテナ一杯に広がるよう保証する */
+.card-media-container video,
+.card-media-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 代表作の動画・画像は「絶対に見切れない（端が切れない）」ようにcontainを指定 */
+.masterpiece-card .card-media-container video,
+.masterpiece-card .card-media-container img {
+    object-fit: contain;
+    background: #000;
+    /* 余白が出た場合は黒背景で引き締める */
+}
+
 /* 展開後、時間差で中身をフェードイン */
 body:not(.editing) .glass-card:hover>* {
     opacity: 1;
@@ -384,7 +493,9 @@ body:not(.editing) .glass-card:hover>* {
 
 .card-image-placeholder {
     width: 100%;
-    height: 150px;
+    height: 100%;
+    /* 親コンテナ(.card-media-container)に完全追従させる */
+    min-height: 150px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     margin-bottom: 15px;
@@ -428,9 +539,26 @@ body:not(.editing) .glass-card:hover>* {
     transition: transform 0.3s ease;
 }
 
+/* ドラッグ判定（掴める枠）を透明なバリアで広げる */
+.star-node::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    z-index: -1;
+    /* 後ろ側で見えないように */
+}
+
 /* 編集中のドラッグ可能状態 */
 .editing .star-node {
     cursor: grab;
+    /* ドラッグ中の遅延を解除し、即座に追従させる */
+    transition: none !important;
+    /* ドラッグに合わせて文字が選択（青色ハイライト）されてしまうのを防ぐ */
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .editing .star-node:active {
@@ -445,6 +573,14 @@ body:not(.editing) .glass-card:hover>* {
     border-radius: 50%;
     box-shadow: 0 0 10px #FFF, 0 0 20px rgba(255, 215, 0, 0.8);
     transition: all 0.3s ease;
+}
+
+/* 代表作の特別ラベル（大きな文字と専用色） */
+.masterpiece-label {
+    font-size: 1.4rem;
+    color: #FFD700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    margin-bottom: 20px;
 }
 
 /* スキル名 */
@@ -773,4 +909,90 @@ body:not(.editing) .star-node:hover .star-tooltip {
 body:not(.editing) .card-media-container,
 body:not(.editing) .about-media-container {
     cursor: zoom-in;
+}
+
+/* ---------------------------------
+   CONTACTセクションのスタイル
+--------------------------------- */
+.contact-links {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.contact-glass {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: 15px;
+    text-decoration: none;
+    color: #FDFBF7;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.2),
+        0 0 10px rgba(255, 215, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.contact-glass:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 215, 0, 0.3);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+.contact-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+    transition: filter 0.3s ease;
+}
+
+.contact-glass:hover .contact-icon {
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+}
+
+.contact-info {
+    text-align: left;
+    overflow: hidden;
+    flex: 1;
+}
+
+.contact-info h4 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    color: #FFD700;
+}
+
+.contact-info p {
+    font-size: 0.95rem;
+    color: #E2DFD8;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.contact-glass:hover .contact-info p {
+    color: #FFF;
+}
+
+/* 編集モード時の挙動調整 */
+.editing .contact-glass {
+    /* リンクの遷移を無効化 */
+    pointer-events: none;
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+.editing .contact-info {
+    /* 編集エリアだけクリック可能にする */
+    pointer-events: auto;
 }

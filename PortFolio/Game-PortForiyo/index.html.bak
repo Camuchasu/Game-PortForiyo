@@ -74,11 +74,34 @@
 
             <section id="skills" class="placeholder-section glass-panel">
                 <h3 class="section-title glow">SKILLS</h3>
-                <p>使用可能な技術やツールをここに記載します。（後から追加予定）</p>
-                <div class="skills-flex">
-                    <span class="skill-tag glow-border">Unity</span>
-                    <span class="skill-tag glow-border">C#</span>
-                    <span class="skill-tag glow-border">C++</span>
+                <p class="editable-text">自身のスキルを星座に見立てて配置します。<br>（編集モード：星をドラッグで移動、文字をクリックで書き換え可能）</p>
+                <div class="constellation-container" id="constellation-container">
+                    <!-- 線を描画するためのSVGキャンバス -->
+                    <svg class="constellation-svg" id="constellation-svg"></svg>
+
+                    <!-- デフォルトの星たち -->
+                    <div class="star-node" style="left: 20%; top: 30%;" data-star-id="1">
+                        <div class="star-point glow-border"></div>
+                        <div class="star-label editable-text">Unity</div>
+                        <div class="star-tooltip editable-text">ゲームエンジンの基本操作、C#スクリプト連携、UI構築、アニメーション制御などが可能です。</div>
+                    </div>
+                    <div class="star-node" style="left: 50%; top: 50%;" data-star-id="2">
+                        <div class="star-point glow-border"></div>
+                        <div class="star-label editable-text">C#</div>
+                        <div class="star-tooltip editable-text">オブジェクト指向設計、非同期処理、LINQなどを用いた堅牢なゲームロジック開発を行います。</div>
+                    </div>
+                    <div class="star-node" style="left: 80%; top: 40%;" data-star-id="3">
+                        <div class="star-point glow-border"></div>
+                        <div class="star-label editable-text">C++</div>
+                        <div class="star-tooltip editable-text">メモリ管理やポインタ操作を理解し、パフォーマンスが必要な部分の最適化を図ります。</div>
+                    </div>
+
+                    <!-- 代表作（マスターピース）用の特大な星 -->
+                    <div class="star-node large-star" style="left: 50%; top: 75%;" data-star-id="4">
+                        <div class="star-point glow-border"></div>
+                        <div class="star-label editable-text masterpiece-label">★MASTERPIECE GAME★</div>
+                        <div class="star-tooltip editable-text">一番頑張ったゲームのタイトルと、そのアピールポイントや注力した技術をここに記載します。</div>
+                    </div>
                 </div>
             </section>
 

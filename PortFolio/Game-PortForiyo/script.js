@@ -1,4 +1,4 @@
-﻿// 星のパーティクル管理クラス
+// 星のパーティクル管理クラス
 class StarParticle {
     constructor(canvasWidth, canvasHeight) {
         // [規約] グローバル変数やクラスメンバは m_ で開始、一文字目は大文字
@@ -34,11 +34,17 @@ class StarParticle {
         this.m_SpeedX = (Math.random() - 0.5) * 0.2;
     }
 
-    update(canvasWidth, canvasHeight) {
+    update(canvasWidth, canvasHeight, scrollVelocity = 0) {
         // 位置のX座標を更新する
         this.m_X += this.m_SpeedX;
-        // 位置のY座標を更新する
+        // 位置のY座標を更新する（ゆっくり上に登る基本分）
         this.m_Y -= this.m_SpeedY;
+
+        // --- パララックス（視差効果）によるY座標の更新 ---
+        // 変化がよりハッキリと分かるよう、視差係数（動きの幅幅）を大きく引き上げました (0.4 -> 1.2)
+        const parallaxFactor = this.m_Radius * 1.2;
+        // スクロール速度に視差係数を掛けた分だけ移動させる
+        this.m_Y -= scrollVelocity * parallaxFactor;
 
         // 透明度の更新を行う（ちかちかを止めたため変化しません）
         this.m_Alpha += this.m_BlinkSpeed * this.m_BlinkDirection;
@@ -47,6 +53,12 @@ class StarParticle {
         if (this.m_Y + this.m_Radius < 0) {
             // Y座標を画面下部にリセットする
             this.m_Y = canvasHeight + this.m_Radius;
+            // X座標をランダムに配置し直す
+            this.m_X = Math.random() * canvasWidth;
+            // 反対に画面下部を越えたら上部へループさせる（上への急速なスクロール対応）
+        } else if (this.m_Y - this.m_Radius > canvasHeight) {
+            // Y座標を画面上部にリセットする
+            this.m_Y = -this.m_Radius;
             // X座標をランダムに配置し直す
             this.m_X = Math.random() * canvasWidth;
         }
@@ -191,6 +203,14 @@ let m_ParticlesArray = [];
 // 流れ星の配列を格納する変数
 let m_ShootingStarsArray = [];
 
+// --- スクロール（パララックス）用のグローバル変数 ---
+// 現在のスクロール位置（目標値）
+let m_CurrentScrollY = 0;
+// 慣性（イージング）追従中の現在のスクロール位置
+let m_EasedScrollY = 0;
+// 前回のフレームでの慣性スクロール位置（差分計算用）
+let m_LastEasedScrollY = 0;
+
 // --- 編集モード用のグローバル変数 ---
 // 編集モード中かどうかのフラグ
 let m_IsEditMode = false;
@@ -200,6 +220,8 @@ let m_CurrentMediaTarget = null;
 let m_WorksGridContainer;
 // AboutMeのコンテナ要素
 let m_AboutContainer;
+// コンタクトのコンテナ要素
+let m_ContactContainer;
 // メディアモーダル要素
 let m_MediaModal;
 // モーダルの枠要素
@@ -308,6 +330,16 @@ function init() {
     // リサイズイベントの登録を行う
     window.addEventListener('resize', handleResize);
 
+    // スクロールイベントの登録を行う（パララックス用）
+    window.addEventListener('scroll', () => {
+        // 現在のスクロール位置を更新する（全ブラウザ環境に確実に対応するため判定を強化）
+        m_CurrentScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    });
+    // 初期スクロール位置を取得してセットする
+    m_CurrentScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    m_EasedScrollY = m_CurrentScrollY;
+    m_LastEasedScrollY = m_CurrentScrollY;
+
     // 初期サイズ設定とパーティクル生成処理を呼ぶ
     handleResize();
 
@@ -351,10 +383,18 @@ function animate() {
     // 古い描画を完全に消去して、透明なキャンバスを保ちます（CSSの綺麗なグラデーションを見せるため）
     m_Ctx.clearRect(0, 0, m_Canvas.width, m_Canvas.height);
 
+    // --- パララックス用：スクロール速度（慣性つき）の計算 ---
+    // 絶対位置としての「目標スクロール量」へ、現在の「慣性スクロール量」を0.1ずつ近づける（イージング処理）
+    m_EasedScrollY += (m_CurrentScrollY - m_EasedScrollY) * 0.1;
+    // 今のフレームで実際に星が動くべき量（差分＝速度）を算出する
+    const currentVelocity = m_EasedScrollY - m_LastEasedScrollY;
+    // 今回の位置を「前回の位置」として上書き保存する
+    m_LastEasedScrollY = m_EasedScrollY;
+
     // 星を1つずつ更新と描画する
     for (let i = 0; i < m_ParticlesArray.length; i++) {
-        // 星の更新処理
-        m_ParticlesArray[i].update(m_Canvas.width, m_Canvas.height);
+        // 星の更新処理（イージング済みのスクロール速度を渡す）
+        m_ParticlesArray[i].update(m_Canvas.width, m_Canvas.height, currentVelocity);
         // 星の描画処理
         m_ParticlesArray[i].draw(m_Ctx);
     }
@@ -380,6 +420,8 @@ function initEditMode() {
     m_WorksGridContainer = document.getElementById('works-grid');
     // AboutMeのコンテナ要素を取得する
     m_AboutContainer = document.getElementById('about-container');
+    // コンタクトのコンテナ要素を取得する
+    m_ContactContainer = document.getElementById('contact');
     // メディア拡大用のモーダル要素を取得する
     m_MediaModal = document.getElementById('media-modal');
     // モーダルの枠を取得する
@@ -400,6 +442,22 @@ function initEditMode() {
     if (savedWorksHTML) {
         // ストレージのHTMLを反映する
         m_WorksGridContainer.innerHTML = savedWorksHTML;
+
+        // 【追加修正】: 古いセーブデータ（代表作カードがない時代のもの）を読み込んだ場合、自動でカードを追加する
+        if (!m_WorksGridContainer.querySelector('.masterpiece-card')) {
+            // 特大の星カードのHTMLを構築する
+            const masterpieceHTML = `
+                <div class="card glass-card masterpiece-card">
+                    <div class="card-media-container card-image-placeholder"></div>
+                    <div class="masterpiece-content-wrap">
+                        <h4 class="editable-text masterpiece-label">★ MASTERPIECE GAME ★</h4>
+                        <p class="editable-text">一番頑張った代表作のタイトルと、アピールポイントや注力した技術をここに記載します。</p>
+                    </div>
+                </div>
+            `;
+            // コンテナの一番最後に代表作カードを追加する
+            m_WorksGridContainer.insertAdjacentHTML('beforeend', masterpieceHTML);
+        }
     }
 
     // --- ABOUT MEの復元処理 ---
@@ -407,6 +465,15 @@ function initEditMode() {
     if (savedAboutHTML) {
         // ストレージのHTMLを反映する
         m_AboutContainer.innerHTML = savedAboutHTML;
+    }
+
+    // --- CONTACTの復元処理 ---
+    if (m_ContactContainer) {
+        const savedContactHTML = localStorage.getItem('portfolioContactHTML');
+        if (savedContactHTML) {
+            // ストレージのHTMLを反映する
+            m_ContactContainer.innerHTML = savedContactHTML;
+        }
     }
 
     // --- SKILLS（星座）の復元処理 ---
@@ -471,6 +538,7 @@ function initEditMode() {
             m_WorksGridContainer.classList.add('editing');
             m_AboutContainer.classList.add('editing');
             if (m_ConstellationContainer) m_ConstellationContainer.classList.add('editing');
+            if (m_ContactContainer) m_ContactContainer.classList.add('editing');
 
             // 全てのテキスト要素を編集可能にする
             document.querySelectorAll('.editable-text').forEach(el => {
@@ -506,6 +574,7 @@ function initEditMode() {
             m_WorksGridContainer.classList.remove('editing');
             m_AboutContainer.classList.remove('editing');
             if (m_ConstellationContainer) m_ConstellationContainer.classList.remove('editing');
+            if (m_ContactContainer) m_ContactContainer.classList.remove('editing');
 
             // 全てのテキスト要素の編集を無効にする
             document.querySelectorAll('.editable-text').forEach(el => {
@@ -513,10 +582,28 @@ function initEditMode() {
                 el.removeAttribute('contenteditable');
             });
 
+            // 約定：テキストをaタグのhrefに同期させる
+            if (m_ContactContainer) {
+                m_ContactContainer.querySelectorAll('a.contact-card').forEach(link => {
+                    const urlEl = link.querySelector('.contact-url');
+                    if (urlEl) {
+                        // URL要素の中身（テキスト）をhrefとして設定し直す
+                        const newUrl = urlEl.innerText.trim();
+                        if (newUrl) {
+                            link.setAttribute('href', newUrl);
+                        }
+                    }
+                });
+            }
+
             // 編集内容をローカルストレージに保存する（再読み込み時に復元するため）
             localStorage.setItem('portfolioWorksHTML', m_WorksGridContainer.innerHTML);
             // ABOUT MEの内容も保存する
             localStorage.setItem('portfolioAboutHTML', m_AboutContainer.innerHTML);
+            // CONTACTの内容も保存する
+            if (m_ContactContainer) {
+                localStorage.setItem('portfolioContactHTML', m_ContactContainer.innerHTML);
+            }
             // SKILLS（星座）の内容も保存する
             if (m_ConstellationContainer) {
                 localStorage.setItem('portfolioSkillsHTML', m_ConstellationContainer.innerHTML);

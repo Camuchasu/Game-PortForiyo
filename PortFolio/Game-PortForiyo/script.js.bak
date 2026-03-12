@@ -34,11 +34,17 @@ class StarParticle {
         this.m_SpeedX = (Math.random() - 0.5) * 0.2;
     }
 
-    update(canvasWidth, canvasHeight) {
+    update(canvasWidth, canvasHeight, scrollVelocity = 0) {
         // 位置のX座標を更新する
         this.m_X += this.m_SpeedX;
-        // 位置のY座標を更新する
+        // 位置のY座標を更新する（ゆっくり上に登る基本分）
         this.m_Y -= this.m_SpeedY;
+
+        // --- パララックス（視差効果）によるY座標の更新 ---
+        // 変化がよりハッキリと分かるよう、視差係数（動きの幅幅）を大きく引き上げました (0.4 -> 1.2)
+        const parallaxFactor = this.m_Radius * 1.2;
+        // スクロール速度に視差係数を掛けた分だけ移動させる
+        this.m_Y -= scrollVelocity * parallaxFactor;
 
         // 透明度の更新を行う（ちかちかを止めたため変化しません）
         this.m_Alpha += this.m_BlinkSpeed * this.m_BlinkDirection;
@@ -47,6 +53,12 @@ class StarParticle {
         if (this.m_Y + this.m_Radius < 0) {
             // Y座標を画面下部にリセットする
             this.m_Y = canvasHeight + this.m_Radius;
+            // X座標をランダムに配置し直す
+            this.m_X = Math.random() * canvasWidth;
+            // 反対に画面下部を越えたら上部へループさせる（上への急速なスクロール対応）
+        } else if (this.m_Y - this.m_Radius > canvasHeight) {
+            // Y座標を画面上部にリセットする
+            this.m_Y = -this.m_Radius;
             // X座標をランダムに配置し直す
             this.m_X = Math.random() * canvasWidth;
         }
@@ -191,6 +203,14 @@ let m_ParticlesArray = [];
 // 流れ星の配列を格納する変数
 let m_ShootingStarsArray = [];
 
+// --- スクロール（パララックス）用のグローバル変数 ---
+// 現在のスクロール位置（目標値）
+let m_CurrentScrollY = 0;
+// 慣性（イージング）追従中の現在のスクロール位置
+let m_EasedScrollY = 0;
+// 前回のフレームでの慣性スクロール位置（差分計算用）
+let m_LastEasedScrollY = 0;
+
 // --- 編集モード用のグローバル変数 ---
 // 編集モード中かどうかのフラグ
 let m_IsEditMode = false;
@@ -206,6 +226,14 @@ let m_MediaModal;
 let m_ModalBody;
 // モーダルの閉じるボタン要素
 let m_ModalCloseBtn;
+
+// --- 星座スキルツリー用のグローバル変数 ---
+// 星座の親コンテナ
+let m_ConstellationContainer;
+// 星を結ぶ線を描画するSVG
+let m_ConstellationSvg;
+// 全ての星（ノード）リスト
+let m_StarNodes = [];
 
 // --- データベース(IndexedDB)用のグローバル変数 ---
 // ブラウザを更新しても動画や画像を永続的に保存するために利用する仕組み
@@ -300,6 +328,16 @@ function init() {
     // リサイズイベントの登録を行う
     window.addEventListener('resize', handleResize);
 
+    // スクロールイベントの登録を行う（パララックス用）
+    window.addEventListener('scroll', () => {
+        // 現在のスクロール位置を更新する（全ブラウザ環境に確実に対応するため判定を強化）
+        m_CurrentScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    });
+    // 初期スクロール位置を取得してセットする
+    m_CurrentScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    m_EasedScrollY = m_CurrentScrollY;
+    m_LastEasedScrollY = m_CurrentScrollY;
+
     // 初期サイズ設定とパーティクル生成処理を呼ぶ
     handleResize();
 
@@ -343,10 +381,18 @@ function animate() {
     // 古い描画を完全に消去して、透明なキャンバスを保ちます（CSSの綺麗なグラデーションを見せるため）
     m_Ctx.clearRect(0, 0, m_Canvas.width, m_Canvas.height);
 
+    // --- パララックス用：スクロール速度（慣性つき）の計算 ---
+    // 絶対位置としての「目標スクロール量」へ、現在の「慣性スクロール量」を0.1ずつ近づける（イージング処理）
+    m_EasedScrollY += (m_CurrentScrollY - m_EasedScrollY) * 0.1;
+    // 今のフレームで実際に星が動くべき量（差分＝速度）を算出する
+    const currentVelocity = m_EasedScrollY - m_LastEasedScrollY;
+    // 今回の位置を「前回の位置」として上書き保存する
+    m_LastEasedScrollY = m_EasedScrollY;
+
     // 星を1つずつ更新と描画する
     for (let i = 0; i < m_ParticlesArray.length; i++) {
-        // 星の更新処理
-        m_ParticlesArray[i].update(m_Canvas.width, m_Canvas.height);
+        // 星の更新処理（イージング済みのスクロール速度を渡す）
+        m_ParticlesArray[i].update(m_Canvas.width, m_Canvas.height, currentVelocity);
         // 星の描画処理
         m_ParticlesArray[i].draw(m_Ctx);
     }
@@ -379,7 +425,11 @@ function initEditMode() {
     // モーダルの閉じるボタンを取得する
     m_ModalCloseBtn = document.getElementById('modal-close-btn');
 
-    // どれか無ければ実行しない
+    // === 星座システム用の要素取得 ===
+    m_ConstellationContainer = document.getElementById('constellation-container');
+    m_ConstellationSvg = document.getElementById('constellation-svg');
+
+    // 必須要素が無ければ実行しない
     if (!editBtn || !uploader || !m_WorksGridContainer || !m_AboutContainer) return;
 
     // --- GAMES & WORKSの復元処理 ---
@@ -395,6 +445,18 @@ function initEditMode() {
     if (savedAboutHTML) {
         // ストレージのHTMLを反映する
         m_AboutContainer.innerHTML = savedAboutHTML;
+    }
+
+    // --- SKILLS（星座）の復元処理 ---
+    if (m_ConstellationContainer) {
+        const savedSkillsHTML = localStorage.getItem('portfolioSkillsHTML');
+        if (savedSkillsHTML) {
+            m_ConstellationContainer.innerHTML = savedSkillsHTML;
+            // innertHTMLの書き換えでSVGの参照が変わるため再取得
+            m_ConstellationSvg = document.getElementById('constellation-svg');
+        }
+        // 初期化や線引きを行う関数の呼び出し
+        initConstellation();
     }
 
     // 【復元処理の共通化】HTMLに記録されているデータIDを頼りに、DBから映像/画像を読み込み直す
@@ -446,6 +508,7 @@ function initEditMode() {
             // コンテナに編集中クラスを付与する
             m_WorksGridContainer.classList.add('editing');
             m_AboutContainer.classList.add('editing');
+            if (m_ConstellationContainer) m_ConstellationContainer.classList.add('editing');
 
             // 全てのテキスト要素を編集可能にする
             document.querySelectorAll('.editable-text').forEach(el => {
@@ -480,6 +543,7 @@ function initEditMode() {
             // コンテナの編集中クラスを外す
             m_WorksGridContainer.classList.remove('editing');
             m_AboutContainer.classList.remove('editing');
+            if (m_ConstellationContainer) m_ConstellationContainer.classList.remove('editing');
 
             // 全てのテキスト要素の編集を無効にする
             document.querySelectorAll('.editable-text').forEach(el => {
@@ -491,8 +555,12 @@ function initEditMode() {
             localStorage.setItem('portfolioWorksHTML', m_WorksGridContainer.innerHTML);
             // ABOUT MEの内容も保存する
             localStorage.setItem('portfolioAboutHTML', m_AboutContainer.innerHTML);
+            // SKILLS（星座）の内容も保存する
+            if (m_ConstellationContainer) {
+                localStorage.setItem('portfolioSkillsHTML', m_ConstellationContainer.innerHTML);
+            }
             // 保存完了のアラートを出す
-            alert('変更をブラウザに完全に保存しました！\n（動画も復元されるようになっています）');
+            alert('変更をブラウザに完全に保存しました！\n（動画や星座の配置も復元されます）');
         }
     });
 
@@ -775,6 +843,135 @@ function initEditMode() {
             }
         });
     }
+}
+
+// ==========================================
+// 星座（スキルツリー）に関する処理
+// ==========================================
+function initConstellation() {
+    if (!m_ConstellationContainer || !m_ConstellationSvg) return;
+
+    // 現在存在する全ての星ノードを取得
+    m_StarNodes = Array.from(m_ConstellationContainer.querySelectorAll('.star-node'));
+
+    // 画面リサイズ時も線を引き直す
+    window.addEventListener('resize', drawConstellationLines);
+
+    // 初回の線引きを実行
+    drawConstellationLines();
+
+    // 各星に対するドラッグ移動イベントの登録
+    m_StarNodes.forEach(node => {
+        // ドラッグ状態を管理するローカル変数
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        // ドラッグ開始の処理（マウス＆タッチ対応）
+        const dragStart = (e) => {
+            if (!m_IsEditMode) return;
+            // 吹き出し等をクリックした時はドラッグ判定にしないよう除外
+            if (e.target.classList.contains('editable-text')) return;
+
+            isDragging = true;
+            // タッチとマウスの両方の座標取得に対応
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            startX = clientX;
+            startY = clientY;
+
+            // 現在のleft/topの%値を取得
+            initialLeft = parseFloat(node.style.left) || 0;
+            initialTop = parseFloat(node.style.top) || 0;
+        };
+
+        // ドラッグ中の処理
+        const dragAction = (e) => {
+            if (!isDragging || !m_IsEditMode) return;
+            e.preventDefault(); // スクロール等の余計な動作を防ぐ
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // 移動量を計算
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            // コンテナの幅と高さを取得して、移動量を % に変換
+            const rect = m_ConstellationContainer.getBoundingClientRect();
+            const percentX = (dx / rect.width) * 100;
+            const percentY = (dy / rect.height) * 100;
+
+            // 新しい位置を計算し、0〜100の範囲内に制限（はみ出し防止）
+            let newLeft = Math.max(0, Math.min(100, initialLeft + percentX));
+            let newTop = Math.max(0, Math.min(100, initialTop + percentY));
+
+            // 星のスタイルを更新
+            node.style.left = `${newLeft}%`;
+            node.style.top = `${newTop}%`;
+
+            // 星が動いたので、線をリアルタイムで引き直す
+            drawConstellationLines();
+        };
+
+        // ドラッグ終了の処理
+        const dragEnd = () => {
+            isDragging = false;
+        };
+
+        // イベントリスナーの登録
+        node.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', dragAction);
+        document.addEventListener('mouseup', dragEnd);
+
+        node.addEventListener('touchstart', dragStart, { passive: false });
+        document.addEventListener('touchmove', dragAction, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+    });
+}
+
+// 星と星を繋ぐSVGの線を計算して描画する関数
+function drawConstellationLines() {
+    if (!m_ConstellationSvg || m_StarNodes.length === 0) return;
+
+    // SVG領域を一旦クリア
+    m_ConstellationSvg.innerHTML = '';
+
+    // 星座の親コンテナの大きさ情報を取得
+    const containerRect = m_ConstellationContainer.getBoundingClientRect();
+
+    // 星座の中心点配列を作る
+    const points = m_StarNodes.map(node => {
+        const nodeRect = node.getBoundingClientRect();
+        // コンテナの左上を基準(0,0)とした中心XとY
+        const centerX = (nodeRect.left - containerRect.left) + (nodeRect.width / 2);
+        const centerY = (nodeRect.top - containerRect.top) + (nodeRect.height / 2);
+        return { x: centerX, y: centerY };
+    });
+
+    // 順番に線を結ぶ（IDの順など、配列の順番に沿って一筆書き）
+    points.forEach((point, index) => {
+        // 最後の星は次の星が無いので線を描かない
+        if (index === points.length - 1) return;
+        const nextPoint = points[index + 1];
+
+        // SVGの直線（line）要素を生成
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        // 開始点のX座標
+        line.setAttribute('x1', point.x);
+        // 開始点のY座標
+        line.setAttribute('y1', point.y);
+        // 終了点のX座標
+        line.setAttribute('x2', nextPoint.x);
+        // 終了点のY座標
+        line.setAttribute('y2', nextPoint.y);
+        // 線の色と透明度
+        line.setAttribute('stroke', 'rgba(255, 215, 0, 0.4)');
+        // 線の太さ
+        line.setAttribute('stroke-width', '1.5');
+        // SVGに追加
+        m_ConstellationSvg.appendChild(line);
+    });
 }
 
 // ページ読み込み完了時に初期化する
