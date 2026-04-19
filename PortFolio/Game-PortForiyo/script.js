@@ -524,6 +524,19 @@ function initEditMode() {
     restoreMedia(m_WorksGridContainer);
     restoreMedia(m_AboutContainer);
 
+    // 公開用保存ボタンの取得を行う
+    const publishBtn = document.getElementById('publish-btn');
+    if (publishBtn) {
+        // 初期状態として表示する（編集モードでないため）
+        publishBtn.style.display = 'block';
+
+        // 🚀 本番公開ボタンのクリックイベントを設定する
+        publishBtn.addEventListener('click', async () => {
+            // エクスポート処理を呼び出す
+            await exportForPublishing();
+        });
+    }
+
     // ボタンのクリックイベントを登録する
     editBtn.addEventListener('click', () => {
         // フラグを反転させる
@@ -532,6 +545,8 @@ function initEditMode() {
         if (m_IsEditMode) {
             // ボタンのテキストを変更する
             editBtn.innerHTML = '💾 編集を保存・終了';
+            // 本番公開ボタンを隠す
+            if (publishBtn) publishBtn.style.display = 'none';
             // 編集中クラスを付与する
             editBtn.classList.add('editing-active');
             // コンテナに編集中クラスを付与する
@@ -568,6 +583,8 @@ function initEditMode() {
         } else {
             // ボタンのテキストを戻す
             editBtn.innerHTML = '✏️ 編集モードON';
+            // 本番公開ボタンを表示する
+            if (publishBtn) publishBtn.style.display = 'block';
             // 編集中クラスを外す
             editBtn.classList.remove('editing-active');
             // コンテナの編集中クラスを外す
@@ -609,7 +626,7 @@ function initEditMode() {
                 localStorage.setItem('portfolioSkillsHTML', m_ConstellationContainer.innerHTML);
             }
             // 保存完了のアラートを出す
-            alert('変更をブラウザに完全に保存しました！\n（動画や星座の配置も復元されます）');
+            alert('変更をブラウザ内に一時保存しました！\n（世界に公開するには🚀本番公開用ファイル保存を押してください）');
         }
     });
 
@@ -1021,6 +1038,95 @@ function drawConstellationLines() {
         // SVGに追加
         m_ConstellationSvg.appendChild(line);
     });
+}
+
+// --- 本番公開ファイル保存（エクスポート）用関数 ---
+async function exportForPublishing() {
+    try {
+        // ディレクトリ選択プロンプトを表示 (対象の PortFolio/Game-PortForiyo フォルダを選ばせる)
+        alert('書き出し先のフォルダ「Game-PortForiyo」を選択してください！\n※上部のブラウザメニューから「変更を許可」を選択できるようになります。');
+        const dirHandle = await window.showDirectoryPicker();
+
+        // assetsフォルダを作成・取得
+        const assetsDirHandle = await dirHandle.getDirectoryHandle('assets', { create: true });
+
+        // 1. 各コンテナのHTMLを localStorage から最新状態で取得
+        // （もし未保存の場合は現在表示中のものを取得する）
+        const worksHTML = localStorage.getItem('portfolioWorksHTML') || m_WorksGridContainer.innerHTML;
+        const aboutHTML = localStorage.getItem('portfolioAboutHTML') || m_AboutContainer.innerHTML;
+        const contactHTML = m_ContactContainer ? (localStorage.getItem('portfolioContactHTML') || m_ContactContainer.innerHTML) : '';
+        const skillsHTML = m_ConstellationContainer ? (localStorage.getItem('portfolioSkillsHTML') || m_ConstellationContainer.innerHTML) : '';
+
+        // 一時的なDOMツリーを作ってHTMLを構築する
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = `
+            <div id="works-temp">${worksHTML}</div>
+            <div id="about-temp">${aboutHTML}</div>
+            <div id="contact-temp">${contactHTML}</div>
+            <div id="skills-temp">${skillsHTML}</div>
+        `;
+
+        // 2. メディアファイル(data-media-id)をDBから抽出し、assetsに書き出しつつパスを書き換える
+        const mediaElements = tempDiv.querySelectorAll('[data-media-id]');
+        for (const el of Array.from(mediaElements)) {
+            const mediaId = el.getAttribute('data-media-id');
+            // 非同期でDBから読み込む Promise
+            const file = await new Promise((resolve) => loadMediaFromDB(mediaId, resolve));
+            if (file) {
+                // ファイル名を生成
+                const ext = file.name ? file.name.split('.').pop() : (file.type.startsWith('video/') ? 'mp4' : 'jpg');
+                const filename = `${mediaId}.${ext}`;
+                // assetsフォルダに書き込む
+                const fileHandle = await assetsDirHandle.getFileHandle(filename, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(file);
+                await writable.close();
+
+                // srcを新しいパスに書き換える (./assets/filename)
+                el.src = `./assets/${filename}`;
+            }
+        }
+
+        // 3. index.html を直接書き換える
+        // 対象フォルダ内にある大元の index.html を取得する
+        const indexHandle = await dirHandle.getFileHandle('index.html');
+        const indexFile = await indexHandle.getFile();
+        let indexText = await indexFile.text();
+
+        // テキストの置換操作：各セクションの innerHTML 部分を入れ替える
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(indexText, 'text/html');
+
+        const docWorks = doc.getElementById('works-grid');
+        if (docWorks) docWorks.innerHTML = tempDiv.querySelector('#works-temp').innerHTML;
+
+        const docAbout = doc.getElementById('about-container');
+        if (docAbout) docAbout.innerHTML = tempDiv.querySelector('#about-temp').innerHTML;
+
+        const docContact = doc.getElementById('contact');
+        if (docContact && contactHTML) {
+            docContact.innerHTML = tempDiv.querySelector('#contact-temp').innerHTML;
+        }
+
+        const docSkills = doc.getElementById('constellation-container');
+        if (docSkills && skillsHTML) docSkills.innerHTML = tempDiv.querySelector('#skills-temp').innerHTML;
+
+        // <!DOCTYPE html> を付与してHTMLテキストに戻す (DOMParserでは<!DOCTYPE html>が省略されるため)
+        const finalHTML = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+
+        const writableIndex = await indexHandle.createWritable();
+        await writableIndex.write(finalHTML);
+        await writableIndex.close();
+
+        alert('🎊 本番公開用のデータ出力が完了しました！\nこのフォルダをそのままGitHub等へPushすれば画像等を含めて全て反映されます！');
+
+    } catch (err) {
+        console.error('保存に失敗しました:', err);
+        // キャンセル時はエラーを出さない
+        if (err.name !== 'AbortError') {
+            alert('保存エラーが発生しました。\nフォルダのアクセスが許可されているか、正しいフォルダが選択されているか確認してください。\nエラー詳細: ' + err.message);
+        }
+    }
 }
 
 // ページ読み込み完了時に初期化する
