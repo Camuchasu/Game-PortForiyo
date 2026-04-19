@@ -17,17 +17,17 @@ for file in os.listdir(asset_dir):
         try:
             clip = VideoFileClip(filepath)
             
-            # Resize if the video width is very large to save space
-            if clip.w > 1280:
-                clip = clip.resized(width=1280)
+            # Resize to ensure it's small enough for Cloudflare Pages (25MB limit)
+            if clip.w > 800:
+                clip = clip.resized(width=800)
             
-            # Force fps down to 30 if it's over 30
-            target_fps = min(clip.fps, 30) if clip.fps else 30
+            # Force fps down to 24 if it's over 24
+            target_fps = min(clip.fps, 24) if clip.fps else 24
 
             clip.write_videofile(temp_filepath, 
                                  codec="libx264", 
                                  audio_codec="aac", 
-                                 bitrate="1500k", 
+                                 bitrate="700k", 
                                  fps=target_fps)
             clip.close()
             
