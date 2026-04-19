@@ -1043,8 +1043,8 @@ function drawConstellationLines() {
 // --- 本番公開ファイル保存（エクスポート）用関数 ---
 async function exportForPublishing() {
     try {
-        // ディレクトリ選択プロンプトを表示 (対象の PortFolio/Game-PortForiyo フォルダを選ばせる)
-        alert('書き出し先のフォルダ「Game-PortForiyo」を選択してください！\n※上部のブラウザメニューから「変更を許可」を選択できるようになります。');
+        // ディレクトリ選択プロンプトを表示
+        alert('★重要★\n書き出し先のフォルダを選択します。\n必ず「PortFolio」の中にある、２つ目の「Game-PortForiyo」フォルダを選択してください！（index.htmlがある場所です）');
         const dirHandle = await window.showDirectoryPicker();
 
         // assetsフォルダを作成・取得
@@ -1076,11 +1076,20 @@ async function exportForPublishing() {
                 // ファイル名を生成
                 const ext = file.name ? file.name.split('.').pop() : (file.type.startsWith('video/') ? 'mp4' : 'jpg');
                 const filename = `${mediaId}.${ext}`;
-                // assetsフォルダに書き込む
-                const fileHandle = await assetsDirHandle.getFileHandle(filename, { create: true });
-                const writable = await fileHandle.createWritable();
-                await writable.write(file);
-                await writable.close();
+                // 既に圧縮済みのファイルが存在する場合は上書きしない（巨大な元ファイルで上書きされるのを防ぐ）
+                let fileExists = false;
+                try {
+                    await assetsDirHandle.getFileHandle(filename);
+                    fileExists = true;
+                } catch (e) { }
+
+                if (!fileExists) {
+                    // assetsフォルダに新規書き込む
+                    const fileHandle = await assetsDirHandle.getFileHandle(filename, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(file);
+                    await writable.close();
+                }
 
                 // srcを新しいパスに書き換える (./assets/filename)
                 el.src = `./assets/${filename}`;
