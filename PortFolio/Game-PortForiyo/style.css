@@ -1094,80 +1094,6 @@ body:not(.editing) .about-media-container {
 }
 
 
-/* ==================================
-   カルーセルサイズの最適化（動画とコメントの全表示対応）
-================================== */
-.carousel-wrapper {
-    min-height: 80vh !important;
-}
-
-#works-grid:not(.editing) {
-    /* カード全体の最大サイズ */
-    width: 600px !important;
-    max-width: 90vw !important;
-    height: 500px !important;
-    max-height: 70vh !important; /* 画面内に収める */
-}
-
-/* 表示モードのアクティブカードのサイズと位置をコンテナと完全一致させる */
-#works-grid:not(.editing) .glass-card.carousel-active {
-    width: 100% !important;
-    height: 100% !important; 
-    min-height: 0 !important;
-    
-    top: 0 !important;
-    left: 0 !important;
-    margin-top: 0 !important;
-    margin-left: 0 !important;
-    
-    /* 動画とテキストがはみ出さないようにFlexboxで管理 */
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 20px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important; 
-}
-
-/* マスターピース特有の余白も全てリセット（カルーセル展開時） */
-#works-grid:not(.editing) .masterpiece-card.carousel-active {
-    margin: 0 !important;
-}
-
-/* 動画部分のサイズ調整制限 */
-#works-grid:not(.editing) .glass-card.carousel-active .card-media-container {
-    flex-shrink: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: 55% !important; /* 動画がカードの半分強までしか占有しないようにする */
-    margin-bottom: 15px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-#works-grid:not(.editing) .glass-card.carousel-active .card-media-container video,
-#works-grid:not(.editing) .glass-card.carousel-active .card-media-container img {
-    max-height: 100% !important;
-    object-fit: contain !important; /* 絶対に見切れないように */
-}
-
-/* コメント・テキスト部分のスクロールと表示保証 */
-/* masterpiece-content-wrap などのテキストを含むすべてのラッパー */
-#works-grid:not(.editing) .glass-card.carousel-active > div:not(.card-media-container),
-#works-grid:not(.editing) .glass-card.carousel-active > h4,
-#works-grid:not(.editing) .glass-card.carousel-active > p {
-    flex-grow: 1 !important;
-    overflow-y: auto !important; /* コンテンツが多い場合はスクロールを許容 */
-}
-
-/* スクロールバーの細さ設定（見た目を綺麗に） */
-#works-grid:not(.editing) .glass-card.carousel-active > div::-webkit-scrollbar {
-    width: 4px;
-}
-#works-grid:not(.editing) .glass-card.carousel-active > div::-webkit-scrollbar-thumb {
-    background: rgba(255, 215, 0, 0.4);
-    border-radius: 2px;
-}
-
 
 /* ==================================
    横一列に並んで回転しながら拡大するギャラリー風カルーセル
@@ -1175,47 +1101,44 @@ body:not(.editing) .about-media-container {
 body:not(.editing) #works-grid {
     display: flex !important;
     flex-direction: row !important;
-    align-items: center !important;
+    align-items: flex-start !important; /* 上揃えにして、カードが下に伸びるのを許容 */
     justify-content: center !important;
     gap: 30px !important;
     width: 100% !important;
     max-width: 100vw !important;
     height: auto !important;
-    min-height: 500px !important;
+    min-height: 480px !important;
     margin: 0 auto !important;
     transform-style: preserve-3d;
     perspective: 1200px;
 }
 
 body:not(.editing) #works-grid .glass-card {
-    /* 通常は星の状態（変更前と同様の丸い光） */
     position: relative !important;
     top: auto !important;
     left: auto !important;
     margin: 0 !important;
-    
-    /* Y軸回転とサイズ変更のスムーズなアニメーション */
     transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
     transform: rotateY(0deg) !important;
 }
 
-/* 常に表示されるように（以前の星化を確実にする） */
+/* 通常の星の状態 */
 body:not(.editing) #works-grid .glass-card:not(.carousel-active) {
     width: 50px !important;
     height: 50px !important;
     border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.8) !important;
     box-shadow: 0 0 10px #FFF, 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6) !important;
+    margin-top: 50px !important; /* 少し下げて中央っぽく見せる */
 }
 
+/* 選択されたカード（制限なく大きく表示） */
 body:not(.editing) #works-grid .glass-card.carousel-active {
-    /* アクティブなカードは展開され、完全に一回転（360度または約90度などのひねり演出）する */
     transform: rotateY(360deg) !important;
-    
-    width: 500px !important;
+    width: 600px !important;
     max-width: 80vw !important;
-    height: 500px !important;
-    max-height: 70vh !important;
+    height: auto !important;     /* 高さは中身に合わせて自動拡張！下に見切れてもスクロールで見る */
+    min-height: 480px !important;
     border-radius: 15px !important;
     
     background: rgba(11, 29, 66, 0.3) !important;
@@ -1223,6 +1146,18 @@ body:not(.editing) #works-grid .glass-card.carousel-active {
     padding: 20px !important;
     display: flex !important;
     flex-direction: column !important;
+    
+    /* 内部スクロールなどは設定せず、あふれる場合はそのまま要素を大きくする */
+    overflow: visible !important;
+}
+
+/* 映像は常に16:9をキープ */
+body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9 !important;
+    max-height: none !important; /* 制限解除 */
+    margin-bottom: 15px !important;
 }
 
 /* テキストや動画のアニメーションや非表示制御 */
