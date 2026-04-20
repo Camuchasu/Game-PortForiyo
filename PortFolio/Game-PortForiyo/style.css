@@ -912,7 +912,7 @@ body:not(.editing) .about-media-container {
     text-decoration: none;
     color: #FDFBF7;
     transition: all 0.3s ease;
-    box-shadow: 
+    box-shadow:
         0 4px 15px rgba(0, 0, 0, 0.2),
         0 0 10px rgba(255, 215, 0, 0.1);
     width: 100%;
@@ -922,7 +922,7 @@ body:not(.editing) .about-media-container {
 .contact-glass:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.1);
-    box-shadow: 
+    box-shadow:
         0 8px 25px rgba(0, 0, 0, 0.3),
         0 0 20px rgba(255, 215, 0, 0.3);
     border-color: rgba(255, 215, 0, 0.5);
@@ -975,6 +975,7 @@ body:not(.editing) .about-media-container {
     /* 編集エリアだけクリック可能にする */
     pointer-events: auto;
 }
+
 /* ==================================
    カルーセル関連のスタイル
 ================================== */
@@ -1010,20 +1011,30 @@ body:not(.editing) .about-media-container {
     align-items: center;
     justify-content: center;
 }
+
 .carousel-btn:hover {
     background: rgba(255, 215, 0, 0.2);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
     transform: translateY(-50%) scale(1.1);
 }
-.carousel-prev { left: -40px; }
-.carousel-next { right: -40px; }
+
+.carousel-prev {
+    left: -40px;
+}
+
+.carousel-next {
+    right: -40px;
+}
 
 /* 編集モード時はボタンを隠す */
-.editing .carousel-btn { display: none; }
+.editing .carousel-btn {
+    display: none;
+}
 
 /* 表示モード（非編集時）の3Dカルーセルトラック */
 #works-grid:not(.editing) {
-    display: block; /* gridを解除 */
+    display: block;
+    /* gridを解除 */
     position: relative;
     width: 300px;
     height: 480px;
@@ -1054,12 +1065,14 @@ body:not(.editing) .about-media-container {
     background: rgba(11, 29, 66, 0.3);
     border: 2px solid rgba(255, 215, 0, 0.8);
     box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2);
-    animation: none; /* 星のアニメーション解除 */
-    opacity: 1; /* 手前なので明瞭に */
+    animation: none;
+    /* 星のアニメーション解除 */
+    opacity: 1;
+    /* 手前なので明瞭に */
 }
 
 /* アクティブなカードの中身を表示 */
-#works-grid:not(.editing) .glass-card.carousel-active > * {
+#works-grid:not(.editing) .glass-card.carousel-active>* {
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
@@ -1071,6 +1084,7 @@ body:not(.editing) .about-media-container {
     aspect-ratio: 16 / 9;
     width: 100%;
 }
+
 #works-grid:not(.editing) .glass-card.carousel-active .card-media-container video,
 #works-grid:not(.editing) .glass-card.carousel-active .card-media-container img {
     object-fit: contain;
@@ -1080,7 +1094,8 @@ body:not(.editing) .about-media-container {
 
 /* 編集モードではない時のマスターピースカードの独自マージンをリセット */
 .card-grid:not(.editing) .masterpiece-card {
-    margin: -50px 0 0 -50px !important;  /* 星状態の中心合わせ */
+    margin: -50px 0 0 -50px !important;
+    /* 星状態の中心合わせ */
 }
 
 /* アクティブカード（フロント表示）時のマージンもリセット・上書き */
@@ -1088,6 +1103,7 @@ body:not(.editing) .about-media-container {
     margin-top: -240px !important;
     margin-left: -150px !important;
 }
+
 #works-grid:not(.editing) .masterpiece-card.carousel-active {
     margin-top: -240px !important;
     margin-left: -150px !important;
@@ -1128,28 +1144,30 @@ body:not(.editing) #works-grid .glass-card:not(.carousel-active) {
     border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.8) !important;
     box-shadow: 0 0 10px #FFF, 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6) !important;
-    margin-top: 50px !important; /* 少し下げて中央っぽく見せる */
+    margin-top: 50px !important;
+    /* 少し下げて中央っぽく見せる */
 }
 
 /* 選択されたカード（制限なく大きく表示） */
 body:not(.editing) #works-grid .glass-card.carousel-active {
-    
-    width: 600px !important;
+
+    width: 500px !important;
     top: 50% !important;
     left: 50% !important;
-    margin-top: -300px !important;
-    margin-left: -300px !important;
+    margin-top: -240px !important;
+    margin-left: -250px !important;
     max-width: 80vw !important;
-    height: auto !important;     /* 高さは中身に合わせて自動拡張！下に見切れてもスクロールで見る */
+    height: auto !important;
+    /* 高さは中身に合わせて自動拡張！下に見切れてもスクロールで見る */
     min-height: 480px !important;
     border-radius: 15px !important;
-    
+
     background: rgba(11, 29, 66, 0.3) !important;
     border: 2px solid rgba(255, 215, 0, 0.8) !important;
     padding: 20px !important;
     display: flex !important;
     flex-direction: column !important;
-    
+
     /* 内部スクロールなどは設定せず、あふれる場合はそのまま要素を大きくする */
     overflow: visible !important;
 }
@@ -1159,18 +1177,19 @@ body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container
     width: 100% !important;
     height: auto !important;
     aspect-ratio: 16 / 9 !important;
-    max-height: none !important; /* 制限解除 */
+    max-height: none !important;
+    /* 制限解除 */
     margin-bottom: 15px !important;
 }
 
 /* テキストや動画のアニメーションや非表示制御 */
-body:not(.editing) #works-grid .glass-card:not(.carousel-active) > * {
+body:not(.editing) #works-grid .glass-card:not(.carousel-active)>* {
     opacity: 0 !important;
     pointer-events: none !important;
     transform: scale(0) !important;
 }
 
-body:not(.editing) #works-grid .glass-card.carousel-active > * {
+body:not(.editing) #works-grid .glass-card.carousel-active>* {
     opacity: 1 !important;
     transform: scale(1) !important;
     transition: opacity 0.4s ease 0.4s, transform 0.4s ease 0.4s !important;

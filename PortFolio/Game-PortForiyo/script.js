@@ -251,12 +251,12 @@ let m_DB = null;
 // --- 作品カルーセル用のグローバル変数 ---
 let m_CarouselIndex = 0;
 let m_CarouselCards = [];
-let m_CarouselRadius = 350;
+let m_CarouselRadius = 360;
 
 function initCarousel() {
     const grid = document.getElementById('works-grid');
     if (!grid) return;
-    
+
     // 最新のカード一覧を取得
     m_CarouselCards = Array.from(grid.querySelectorAll('.glass-card'));
     if (m_CarouselCards.length === 0) return;
@@ -274,7 +274,7 @@ function initCarousel() {
     // 代表作（マスターピース）が最初に表示されるようにインデックスを合わせる
     let masterpieceIdx = m_CarouselCards.findIndex(card => card.classList.contains('masterpiece-card'));
     if (masterpieceIdx === -1) masterpieceIdx = 0;
-    
+
     m_CarouselIndex = masterpieceIdx;
     updateCarouselDisplay();
 }
@@ -284,12 +284,12 @@ function updateCarouselDisplay() {
     if (!grid || m_IsEditMode || m_CarouselCards.length === 0) return;
 
     const numCards = m_CarouselCards.length;
-    const theta = 360 / numCards; 
+    const theta = 360 / numCards;
 
     m_CarouselCards.forEach((card, index) => {
         let angle = index * theta;
         card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px)`;
-        
+
         if (index === m_CarouselIndex) {
             card.classList.add('carousel-active');
         } else {
@@ -696,7 +696,7 @@ function initEditMode() {
             }
             // 保存完了のアラートを出す
             alert('変更をブラウザ内に一時保存しました！\n（世界に公開するには🚀本番公開用ファイル保存を押してください）');
-            
+
             // 編集モードから抜けた際、または入った際にカルーセルを再計算
             initCarousel();
         }
@@ -780,7 +780,7 @@ function initEditMode() {
         }
     });
 
-    
+
     // ==== カルーセルのボタンイベント ====
     const prevBtn = document.getElementById('carousel-prev');
     const nextBtn = document.getElementById('carousel-next');
