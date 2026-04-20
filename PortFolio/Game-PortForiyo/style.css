@@ -301,11 +301,11 @@ body:not(.editing) .glass-card {
 }
 
 /* ランダムな自然さを出すためのアニメーション遅延 */
-body:not(.editing) .card-grid .glass-card:nth-child(2) {
+.card-grid:not(.editing) .glass-card:nth-child(2) {
     animation-delay: 1.5s;
 }
 
-body:not(.editing) .card-grid .glass-card:nth-child(3) {
+.card-grid:not(.editing) .glass-card:nth-child(3) {
     animation-delay: 0.8s;
 }
 
@@ -1022,7 +1022,7 @@ body:not(.editing) .about-media-container {
 .editing .carousel-btn { display: none; }
 
 /* 表示モード（非編集時）の3Dカルーセルトラック */
-body:not(.editing) #works-grid {
+#works-grid:not(.editing) {
     display: block; /* gridを解除 */
     position: relative;
     width: 300px;
@@ -1033,7 +1033,7 @@ body:not(.editing) #works-grid {
 }
 
 /* 表示モードの各星（カード）のポジショニング */
-body:not(.editing) #works-grid .glass-card {
+#works-grid:not(.editing) .glass-card {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1043,7 +1043,7 @@ body:not(.editing) #works-grid .glass-card {
 }
 
 /* 表示モードの際、フロントにある（アクティブな）カードを展開する */
-body:not(.editing) #works-grid .glass-card.carousel-active {
+#works-grid:not(.editing) .glass-card.carousel-active {
     width: 100%;
     height: auto;
     min-height: 480px;
@@ -1059,36 +1059,36 @@ body:not(.editing) #works-grid .glass-card.carousel-active {
 }
 
 /* アクティブなカードの中身を表示 */
-body:not(.editing) #works-grid .glass-card.carousel-active > * {
+#works-grid:not(.editing) .glass-card.carousel-active > * {
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
 }
 
 /* アクティブカード（代表作なども含む）のメディア表示設定 */
-body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container {
+#works-grid:not(.editing) .glass-card.carousel-active .card-media-container {
     height: auto;
     aspect-ratio: 16 / 9;
     width: 100%;
 }
-body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container video,
-body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container img {
+#works-grid:not(.editing) .glass-card.carousel-active .card-media-container video,
+#works-grid:not(.editing) .glass-card.carousel-active .card-media-container img {
     object-fit: contain;
     background: #000;
 }
 
 
 /* 編集モードではない時のマスターピースカードの独自マージンをリセット */
-body:not(.editing) .card-grid .masterpiece-card {
+.card-grid:not(.editing) .masterpiece-card {
     margin: -50px 0 0 -50px !important;  /* 星状態の中心合わせ */
 }
 
 /* アクティブカード（フロント表示）時のマージンもリセット・上書き */
-body:not(.editing) #works-grid .glass-card.carousel-active {
+#works-grid:not(.editing) .glass-card.carousel-active {
     margin-top: -240px !important;
     margin-left: -150px !important;
 }
-body:not(.editing) #works-grid .masterpiece-card.carousel-active {
+#works-grid:not(.editing) .masterpiece-card.carousel-active {
     margin-top: -240px !important;
     margin-left: -150px !important;
 }
@@ -1101,7 +1101,7 @@ body:not(.editing) #works-grid .masterpiece-card.carousel-active {
     min-height: 80vh !important;
 }
 
-body:not(.editing) #works-grid {
+#works-grid:not(.editing) {
     /* カード全体の最大サイズ */
     width: 600px !important;
     max-width: 90vw !important;
@@ -1110,7 +1110,7 @@ body:not(.editing) #works-grid {
 }
 
 /* 表示モードのアクティブカードのサイズと位置をコンテナと完全一致させる */
-body:not(.editing) #works-grid .glass-card.carousel-active {
+#works-grid:not(.editing) .glass-card.carousel-active {
     width: 100% !important;
     height: 100% !important; 
     min-height: 0 !important;
@@ -1129,12 +1129,12 @@ body:not(.editing) #works-grid .glass-card.carousel-active {
 }
 
 /* マスターピース特有の余白も全てリセット（カルーセル展開時） */
-body:not(.editing) #works-grid .masterpiece-card.carousel-active {
+#works-grid:not(.editing) .masterpiece-card.carousel-active {
     margin: 0 !important;
 }
 
 /* 動画部分のサイズ調整制限 */
-body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container {
+#works-grid:not(.editing) .glass-card.carousel-active .card-media-container {
     flex-shrink: 0 !important;
     width: 100% !important;
     height: auto !important;
@@ -1144,26 +1144,26 @@ body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container
     justify-content: center !important;
     align-items: center !important;
 }
-body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container video,
-body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container img {
+#works-grid:not(.editing) .glass-card.carousel-active .card-media-container video,
+#works-grid:not(.editing) .glass-card.carousel-active .card-media-container img {
     max-height: 100% !important;
     object-fit: contain !important; /* 絶対に見切れないように */
 }
 
 /* コメント・テキスト部分のスクロールと表示保証 */
 /* masterpiece-content-wrap などのテキストを含むすべてのラッパー */
-body:not(.editing) #works-grid .glass-card.carousel-active > div:not(.card-media-container),
-body:not(.editing) #works-grid .glass-card.carousel-active > h4,
-body:not(.editing) #works-grid .glass-card.carousel-active > p {
+#works-grid:not(.editing) .glass-card.carousel-active > div:not(.card-media-container),
+#works-grid:not(.editing) .glass-card.carousel-active > h4,
+#works-grid:not(.editing) .glass-card.carousel-active > p {
     flex-grow: 1 !important;
     overflow-y: auto !important; /* コンテンツが多い場合はスクロールを許容 */
 }
 
 /* スクロールバーの細さ設定（見た目を綺麗に） */
-body:not(.editing) #works-grid .glass-card.carousel-active > div::-webkit-scrollbar {
+#works-grid:not(.editing) .glass-card.carousel-active > div::-webkit-scrollbar {
     width: 4px;
 }
-body:not(.editing) #works-grid .glass-card.carousel-active > div::-webkit-scrollbar-thumb {
+#works-grid:not(.editing) .glass-card.carousel-active > div::-webkit-scrollbar-thumb {
     background: rgba(255, 215, 0, 0.4);
     border-radius: 2px;
 }
