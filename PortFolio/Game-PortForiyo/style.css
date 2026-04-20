@@ -996,3 +996,120 @@ body:not(.editing) .about-media-container {
     /* 編集エリアだけクリック可能にする */
     pointer-events: auto;
 }
+/* ==================================
+   カルーセル関連のスタイル
+================================== */
+.carousel-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(11, 29, 66, 0.6);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    color: #FFD700;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.carousel-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    transform: translateY(-50%) scale(1.1);
+}
+.carousel-prev { left: -40px; }
+.carousel-next { right: -40px; }
+
+/* 編集モード時はボタンを隠す */
+.editing .carousel-btn { display: none; }
+
+/* 表示モード（非編集時）の3Dカルーセルトラック */
+body:not(.editing) #works-grid {
+    display: block; /* gridを解除 */
+    position: relative;
+    width: 300px;
+    height: 480px;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+    margin-top: 0;
+}
+
+/* 表示モードの各星（カード）のポジショニング */
+body:not(.editing) #works-grid .glass-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    /* 回転はJSで制御 */
+}
+
+/* 表示モードの際、フロントにある（アクティブな）カードを展開する */
+body:not(.editing) #works-grid .glass-card.carousel-active {
+    width: 100%;
+    height: auto;
+    min-height: 480px;
+    /* 300px幅のコンテナに対して、元のカードを展開させるための中心オフセット */
+    margin-top: -240px;
+    margin-left: -150px;
+    border-radius: 15px;
+    background: rgba(11, 29, 66, 0.3);
+    border: 2px solid rgba(255, 215, 0, 0.8);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2);
+    animation: none; /* 星のアニメーション解除 */
+    opacity: 1; /* 手前なので明瞭に */
+}
+
+/* アクティブなカードの中身を表示 */
+body:not(.editing) #works-grid .glass-card.carousel-active > * {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+/* アクティブカード（代表作なども含む）のメディア表示設定 */
+body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container {
+    height: auto;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+}
+body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container video,
+body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container img {
+    object-fit: contain;
+    background: #000;
+}
+
+
+/* 編集モードではない時のマスターピースカードの独自マージンをリセット */
+body:not(.editing) .card-grid .masterpiece-card {
+    margin: -50px 0 0 -50px !important;  /* 星状態の中心合わせ */
+}
+
+/* アクティブカード（フロント表示）時のマージンもリセット・上書き */
+body:not(.editing) #works-grid .glass-card.carousel-active {
+    margin-top: -240px !important;
+    margin-left: -150px !important;
+}
+body:not(.editing) #works-grid .masterpiece-card.carousel-active {
+    margin-top: -240px !important;
+    margin-left: -150px !important;
+}

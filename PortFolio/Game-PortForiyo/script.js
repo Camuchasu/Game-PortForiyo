@@ -247,6 +247,72 @@ const m_StoreName = 'media_store';
 let m_DB = null;
 
 // データベースの初期化を行う
+
+// --- 作品カルーセル用のグローバル変数 ---
+let m_CarouselIndex = 0;
+let m_CarouselCards = [];
+let m_CarouselRadius = 350;
+
+function initCarousel() {
+    const grid = document.getElementById('works-grid');
+    if (!grid) return;
+    
+    // 最新のカード一覧を取得
+    m_CarouselCards = Array.from(grid.querySelectorAll('.glass-card'));
+    if (m_CarouselCards.length === 0) return;
+
+    if (m_IsEditMode) {
+        // 編集モードなら3D配置を解除して通常グリッドに戻す
+        grid.style.transform = '';
+        m_CarouselCards.forEach(card => {
+            card.style.transform = '';
+            card.classList.remove('carousel-active');
+        });
+        return;
+    }
+
+    // 代表作（マスターピース）が最初に表示されるようにインデックスを合わせる
+    let masterpieceIdx = m_CarouselCards.findIndex(card => card.classList.contains('masterpiece-card'));
+    if (masterpieceIdx === -1) masterpieceIdx = 0;
+    
+    m_CarouselIndex = masterpieceIdx;
+    updateCarouselDisplay();
+}
+
+function updateCarouselDisplay() {
+    const grid = document.getElementById('works-grid');
+    if (!grid || m_IsEditMode || m_CarouselCards.length === 0) return;
+
+    const numCards = m_CarouselCards.length;
+    const theta = 360 / numCards; 
+
+    m_CarouselCards.forEach((card, index) => {
+        let angle = index * theta;
+        // カードを円周上に配置
+        card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px)`;
+        
+        if (index === m_CarouselIndex) {
+            card.classList.add('carousel-active');
+        } else {
+            card.classList.remove('carousel-active');
+        }
+    });
+
+    // トラック自体を回転させ、アクティブなカードを正面(Z=0)に持ってくる
+    grid.style.transform = `translateZ(${-m_CarouselRadius}px) rotateY(${-m_CarouselIndex * theta}deg)`;
+}
+
+function rotateCarousel(direction) {
+    if (m_CarouselCards.length === 0 || m_IsEditMode) return;
+    m_CarouselIndex += direction;
+    if (m_CarouselIndex < 0) {
+        m_CarouselIndex = m_CarouselCards.length - 1;
+    } else if (m_CarouselIndex >= m_CarouselCards.length) {
+        m_CarouselIndex = 0;
+    }
+    updateCarouselDisplay();
+}
+
 function initDB(callback) {
     // IndexedDBを開くリクエストを送信する
     const request = indexedDB.open(m_DbName, 1);
@@ -543,6 +609,8 @@ function initEditMode() {
         m_IsEditMode = !m_IsEditMode;
 
         if (m_IsEditMode) {
+            // カルーセル表示をリセット
+            initCarousel();
             // ボタンのテキストを変更する
             editBtn.innerHTML = '💾 編集を保存・終了';
             // 本番公開ボタンを隠す
@@ -627,6 +695,9 @@ function initEditMode() {
             }
             // 保存完了のアラートを出す
             alert('変更をブラウザ内に一時保存しました！\n（世界に公開するには🚀本番公開用ファイル保存を押してください）');
+            
+            // 編集モードから抜けた際、または入った際にカルーセルを再計算
+            initCarousel();
         }
     });
 
@@ -707,6 +778,16 @@ function initEditMode() {
             }
         }
     });
+
+    
+    // ==== カルーセルのボタンイベント ====
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    if (prevBtn) prevBtn.addEventListener('click', () => rotateCarousel(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => rotateCarousel(1));
+
+    // 初回カルーセル初期化
+    initCarousel();
 
     // ファイルが選択され、アップロードされる際の処理
     uploader.addEventListener('change', (e) => {
