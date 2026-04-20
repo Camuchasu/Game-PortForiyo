@@ -284,21 +284,50 @@ function updateCarouselDisplay() {
     if (!grid || m_IsEditMode || m_CarouselCards.length === 0) return;
 
     const numCards = m_CarouselCards.length;
-    const theta = 360 / numCards;
 
     m_CarouselCards.forEach((card, index) => {
-        let angle = index * theta;
-        card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px)`;
+        let diff = (index - m_CarouselIndex) % numCards;
+        if (diff < 0) diff += numCards;
 
-        if (index === m_CarouselIndex) {
+        // クラスの付け外し（フロントのみアクティブ化）
+        if (diff === 0) {
             card.classList.add('carousel-active');
         } else {
             card.classList.remove('carousel-active');
         }
+        
+        // --- ユーザーの指定画像（手前・両隣・一番後ろ）に基づく立体ビルボード配置 ---
+        // 常に正面（rotateY(0deg)）を向けつつ、Z軸とスケールで遠近感を出す
+        if (diff === 0) {
+            // 0: 一番手前（明るく、大きい）
+            card.style.transform = `translateX(0px) translateZ(0px) scale(1)`;
+            card.style.opacity = '1';
+            card.style.zIndex = '10';
+            card.style.filter = 'brightness(1)';
+        } else if (diff === 1) {
+            // 1: 右隣（少し遠く、暗め）
+            // カードが600px幅になることを考慮し、X軸を大きくずらす
+            card.style.transform = `translateX(380px) translateZ(-150px) scale(0.8)`;
+            card.style.opacity = '0.6';
+            card.style.zIndex = '5';
+            card.style.filter = 'brightness(0.5)';
+        } else if (diff === numCards - 1) {
+            // 3(最後の要素): 左隣（少し遠く、暗め）
+            card.style.transform = `translateX(-380px) translateZ(-150px) scale(0.8)`;
+            card.style.opacity = '0.6';
+            card.style.zIndex = '5';
+            card.style.filter = 'brightness(0.5)';
+        } else {
+            // 2(それ以外): 一番後ろ（さらに暗く、遠目）
+            card.style.transform = `translateX(0px) translateZ(-300px) scale(0.5)`;
+            card.style.opacity = '0.3';
+            card.style.zIndex = '1';
+            card.style.filter = 'brightness(0.3)';
+        }
     });
 
-    // 最初に実装した「Y軸に90度回転」する3Dカルーセル機構を復元
-    grid.style.transform = `translateZ(${-m_CarouselRadius}px) rotateY(${-m_CarouselIndex * theta}deg)`;
+    // コンテナ自体の回転は行わない（カードが常に前を向くように）
+    grid.style.transform = `translateZ(0px) rotateY(0deg)`;
 }
 
 function rotateCarousel(direction) {

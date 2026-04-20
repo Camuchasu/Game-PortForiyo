@@ -1194,3 +1194,86 @@ body:not(.editing) #works-grid .glass-card.carousel-active>* {
     transform: scale(1) !important;
     transition: opacity 0.4s ease 0.4s, transform 0.4s ease 0.4s !important;
 }
+
+/* ==================================
+   ガシャ画面風 スマホビュー 3D立体配置カルーセル
+================================== */
+body:not(.editing) #works-grid {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 600px !important;
+    max-width: 100vw !important;
+    height: auto !important;
+    min-height: 550px !important;
+    margin: 0 auto !important;
+    transform-style: preserve-3d;
+    perspective: 1200px;
+}
+
+body:not(.editing) #works-grid .glass-card {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin-top: -25px !important; /* height 50px / 2 */
+    margin-left: -25px !important; /* width 50px / 2 */
+    transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    
+    /* 星のデフォルトサイズ */
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 0 10px #FFF, 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6) !important;
+}
+
+/* 選ばれたアクティブなカードへの展開 */
+body:not(.editing) #works-grid .glass-card.carousel-active {
+    width: 600px !important;
+    max-width: 85vw !important;
+    height: auto !important;
+    min-height: 480px !important;
+    border-radius: 15px !important;
+    
+    /* Center offset for the large card */
+    /* width is up to 600, so we use transform translate(-50%, -50%)? No, JS handles transform. */
+    /* Because JS handles transform translate, we must redefine margin offsets so it grows smoothly! */
+    margin-top: -240px !important; /* Approx half height */
+    margin-left: -300px !important; /* Approx half width */
+    
+    background: rgba(11, 29, 66, 0.4) !important;
+    border: 2px solid rgba(255, 215, 0, 0.9) !important;
+    padding: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    
+    overflow: visible !important;
+}
+
+/* モバイル時の左右の星の配置調整（はみ出し防止） */
+@media (max-width: 768px) {
+    body:not(.editing) #works-grid .glass-card.carousel-active {
+        margin-left: -42.5vw !important; /* max-width 85vw の半分 */
+    }
+}
+
+/* メディアや文章の可視化制御 */
+body:not(.editing) #works-grid .glass-card:not(.carousel-active) > * {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: scale(0) !important;
+}
+
+body:not(.editing) #works-grid .glass-card.carousel-active > * {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    transition: opacity 0.4s ease 0.4s, transform 0.4s ease 0.4s !important;
+}
+
+body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9 !important;
+    margin-bottom: 15px !important;
+}
