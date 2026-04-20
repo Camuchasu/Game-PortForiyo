@@ -300,26 +300,26 @@ function updateCarouselDisplay() {
         // 常に正面（rotateY(0deg)）を向けつつ、Z軸とスケールで遠近感を出す
         if (diff === 0) {
             // 0: 一番手前（明るく、大きい）
-            card.style.transform = `translate(-50%, -50%) translateZ(0px) scale(1)`;
+            card.style.transform = `translateZ(0px) scale(1) rotateY(0deg)`;
             card.style.opacity = '1';
             card.style.zIndex = '10';
             card.style.filter = 'brightness(1)';
         } else if (diff === 1) {
             // 1: 右隣（少し遠く、暗め）
             // カードが600px幅になることを考慮し、X軸を大きくずらす
-            card.style.transform = `translate(-50%, -50%) translateX(300px) translateZ(-150px) scale(0.8)`;
+            card.style.transform = `translateX(300px) translateZ(-150px) scale(0.8) rotateY(0deg)`;
             card.style.opacity = '0.6';
             card.style.zIndex = '5';
             card.style.filter = 'brightness(0.5)';
         } else if (diff === numCards - 1) {
             // 3(最後の要素): 左隣（少し遠く、暗め）
-            card.style.transform = `translate(-50%, -50%) translateX(-300px) translateZ(-150px) scale(0.8)`;
+            card.style.transform = `translateX(-300px) translateZ(-150px) scale(0.8) rotateY(0deg)`;
             card.style.opacity = '0.6';
             card.style.zIndex = '5';
             card.style.filter = 'brightness(0.5)';
         } else {
             // 2(それ以外): 一番後ろ（さらに暗く、遠目）
-            card.style.transform = `translate(-50%, -50%) translateX(0px) translateZ(-300px) scale(0.5)`;
+            card.style.transform = `translateX(0px) translateZ(-300px) scale(0.5) rotateY(0deg)`;
             card.style.opacity = '0.3';
             card.style.zIndex = '1';
             card.style.filter = 'brightness(0.3)';

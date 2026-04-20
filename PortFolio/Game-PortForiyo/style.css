@@ -328,12 +328,12 @@ body:not(.editing) .masterpiece-card {
 
     0%,
     100% {
-        transform: translateY(0) scale(1.0);
+        top: 50%; width: 100px; height: 100px;
         box-shadow: 0 0 20px #FFF, 0 0 50px rgba(255, 215, 0, 1), 0 0 80px rgba(255, 215, 0, 0.6);
     }
 
     50% {
-        transform: translateY(-10px) scale(1.1);
+        top: calc(50% - 10px); width: 110px; height: 110px; margin-left: -5px; margin-top: -5px;
         box-shadow: 0 0 30px #FFF, 0 0 70px rgba(255, 215, 0, 1), 0 0 120px rgba(255, 215, 0, 0.8);
         background: radial-gradient(circle, #FFFFFF 40%, #FFD700 80%);
     }
@@ -344,7 +344,7 @@ body:not(.editing) .masterpiece-card {
 
     0%,
     100% {
-        transform: translateY(0);
+        top: 50%;
         box-shadow:
             0 0 10px #FFF,
             0 0 20px rgba(255, 215, 0, 0.6),
@@ -353,7 +353,7 @@ body:not(.editing) .masterpiece-card {
     }
 
     50% {
-        transform: translateY(-8px);
+        top: calc(50% - 8px);
         /* ふわっと上へ浮く */
         box-shadow:
             0 0 15px #FFF,
@@ -1276,4 +1276,42 @@ body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container
     height: auto !important;
     aspect-ratio: 16 / 9 !important;
     margin-bottom: 15px !important;
+}
+
+
+/* ==============================================================
+   FINAL BULLETPROOF CENTERING
+   To eliminate all right-shift bugs explicitly
+============================================================== */
+
+/* Base container must be cleanly centered */
+body:not(.editing) #works-grid {
+    width: 600px !important;
+    max-width: 100vw !important;
+    margin: 0 auto !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+/* Generic star centering */
+body:not(.editing) #works-grid .glass-card {
+    top: 50% !important;
+    left: 50% !important;
+    margin-top: -25px !important; /* Half of 50px star height */
+    margin-left: -25px !important; /* Half of 50px star width */
+}
+
+/* Active card centering */
+body:not(.editing) #works-grid .glass-card.carousel-active {
+    width: 600px !important; /* Fixed width for calculation */
+    height: auto !important;
+    margin-top: -250px !important; /* Approximate vertical centering */
+    margin-left: -300px !important; /* EXACTLY HALF OF 600px WIDTH */
+}
+
+@media (max-width: 768px) {
+    body:not(.editing) #works-grid .glass-card.carousel-active {
+        width: 85vw !important;
+        margin-left: -42.5vw !important; /* EXACTLY HALF OF 85vw WIDTH */
+    }
 }
