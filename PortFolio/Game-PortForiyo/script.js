@@ -283,13 +283,9 @@ function updateCarouselDisplay() {
     const grid = document.getElementById('works-grid');
     if (!grid || m_IsEditMode || m_CarouselCards.length === 0) return;
 
-    const numCards = m_CarouselCards.length;
-    const theta = 360 / numCards; 
-
     m_CarouselCards.forEach((card, index) => {
-        let angle = index * theta;
-        // カードを円周上に配置
-        card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px)`;
+        // インラインのtransformを削除し、純粋にCSSのflexとクラスに任せる
+        card.style.transform = '';
         
         if (index === m_CarouselIndex) {
             card.classList.add('carousel-active');
@@ -298,8 +294,8 @@ function updateCarouselDisplay() {
         }
     });
 
-    // トラック自体を回転させ、アクティブなカードを正面(Z=0)に持ってくる
-    grid.style.transform = `translateZ(${-m_CarouselRadius}px) rotateY(${-m_CarouselIndex * theta}deg)`;
+    // コンテナ周りの回転もリセット
+    grid.style.transform = '';
 }
 
 function rotateCarousel(direction) {
@@ -619,6 +615,7 @@ function initEditMode() {
             editBtn.classList.add('editing-active');
             // コンテナに編集中クラスを付与する
             m_WorksGridContainer.classList.add('editing');
+            document.body.classList.add('editing');
             m_AboutContainer.classList.add('editing');
             if (m_ConstellationContainer) m_ConstellationContainer.classList.add('editing');
             if (m_ContactContainer) m_ContactContainer.classList.add('editing');
@@ -657,6 +654,7 @@ function initEditMode() {
             editBtn.classList.remove('editing-active');
             // コンテナの編集中クラスを外す
             m_WorksGridContainer.classList.remove('editing');
+            document.body.classList.remove('editing');
             m_AboutContainer.classList.remove('editing');
             if (m_ConstellationContainer) m_ConstellationContainer.classList.remove('editing');
             if (m_ContactContainer) m_ContactContainer.classList.remove('editing');
