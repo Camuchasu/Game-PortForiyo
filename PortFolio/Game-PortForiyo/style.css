@@ -1099,27 +1099,26 @@ body:not(.editing) .about-media-container {
    横一列に並んで回転しながら拡大するギャラリー風カルーセル
 ================================== */
 body:not(.editing) #works-grid {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important; /* 上揃えにして、カードが下に伸びるのを許容 */
-    justify-content: center !important;
-    gap: 30px !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-    height: auto !important;
-    min-height: 480px !important;
+    display: block !important;
+    position: relative !important;
+    width: 600px !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin-top: -300px !important;
+    margin-left: -300px !important;
+    height: 500px !important;
     margin: 0 auto !important;
     transform-style: preserve-3d;
-    perspective: 1200px;
+    transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 body:not(.editing) #works-grid .glass-card {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    margin: 0 !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin-top: -25px !important;
+    margin-left: -25px !important;
     transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-    transform: rotateY(0deg) !important;
 }
 
 /* 通常の星の状態 */
@@ -1134,8 +1133,12 @@ body:not(.editing) #works-grid .glass-card:not(.carousel-active) {
 
 /* 選択されたカード（制限なく大きく表示） */
 body:not(.editing) #works-grid .glass-card.carousel-active {
-    transform: rotateY(360deg) !important;
+    
     width: 600px !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin-top: -300px !important;
+    margin-left: -300px !important;
     max-width: 80vw !important;
     height: auto !important;     /* 高さは中身に合わせて自動拡張！下に見切れてもスクロールで見る */
     min-height: 480px !important;

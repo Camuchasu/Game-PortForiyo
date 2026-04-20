@@ -283,9 +283,12 @@ function updateCarouselDisplay() {
     const grid = document.getElementById('works-grid');
     if (!grid || m_IsEditMode || m_CarouselCards.length === 0) return;
 
+    const numCards = m_CarouselCards.length;
+    const theta = 360 / numCards; 
+
     m_CarouselCards.forEach((card, index) => {
-        // インラインのtransformを削除し、純粋にCSSのflexとクラスに任せる
-        card.style.transform = '';
+        let angle = index * theta;
+        card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px)`;
         
         if (index === m_CarouselIndex) {
             card.classList.add('carousel-active');
@@ -294,8 +297,8 @@ function updateCarouselDisplay() {
         }
     });
 
-    // コンテナ周りの回転もリセット
-    grid.style.transform = '';
+    // 最初に実装した「Y軸に90度回転」する3Dカルーセル機構を復元
+    grid.style.transform = `translateZ(${-m_CarouselRadius}px) rotateY(${-m_CarouselIndex * theta}deg)`;
 }
 
 function rotateCarousel(direction) {
