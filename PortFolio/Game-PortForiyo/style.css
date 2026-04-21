@@ -1122,7 +1122,7 @@ body:not(.editing) #works-grid {
     left: 50% !important;
     
     
-    height: 500px !important;
+    /* removed height !important */
     margin: 0 auto !important;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -1140,7 +1140,7 @@ body:not(.editing) #works-grid .glass-card {
 /* 通常の星の状態 */
 body:not(.editing) #works-grid .glass-card:not(.carousel-active) {
     width: 50px !important;
-    height: 50px !important;
+    /* removed height !important */
     border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.8) !important;
     box-shadow: 0 0 10px #FFF, 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6) !important;
@@ -1159,7 +1159,7 @@ body:not(.editing) #works-grid .glass-card.carousel-active {
     max-width: 80vw !important;
     height: auto !important;
     /* 高さは中身に合わせて自動拡張！下に見切れてもスクロールで見る */
-    min-height: 480px !important;
+    min-/* removed height !important */
     border-radius: 15px !important;
 
     background: rgba(11, 29, 66, 0.3) !important;
@@ -1186,12 +1186,12 @@ body:not(.editing) #works-grid .glass-card.carousel-active .card-media-container
 body:not(.editing) #works-grid .glass-card:not(.carousel-active)>* {
     opacity: 0 !important;
     pointer-events: none !important;
-    transform: scale(0) !important;
+    
 }
 
 body:not(.editing) #works-grid .glass-card.carousel-active>* {
     opacity: 1 !important;
-    transform: scale(1) !important;
+    
     transition: opacity 0.4s ease 0.4s, transform 0.4s ease 0.4s !important;
 }
 
@@ -1206,7 +1206,7 @@ body:not(.editing) #works-grid {
     width: 600px !important;
     max-width: 100vw !important;
     height: auto !important;
-    min-height: 550px !important;
+    min-/* removed height !important */
     margin: 0 auto !important;
     transform-style: preserve-3d;
     perspective: 1200px;
@@ -1222,7 +1222,7 @@ body:not(.editing) #works-grid .glass-card {
     
     /* 星のデフォルトサイズ */
     width: 50px !important;
-    height: 50px !important;
+    /* removed height !important */
     border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.8) !important;
     box-shadow: 0 0 10px #FFF, 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6) !important;
@@ -1233,7 +1233,7 @@ body:not(.editing) #works-grid .glass-card.carousel-active {
     width: 600px !important;
     max-width: 85vw !important;
     height: auto !important;
-    min-height: 480px !important;
+    min-/* removed height !important */
     border-radius: 15px !important;
     
     /* Center offset for the large card */
@@ -1262,12 +1262,12 @@ body:not(.editing) #works-grid .glass-card.carousel-active {
 body:not(.editing) #works-grid .glass-card:not(.carousel-active) > * {
     opacity: 0 !important;
     pointer-events: none !important;
-    transform: scale(0) !important;
+    
 }
 
 body:not(.editing) #works-grid .glass-card.carousel-active > * {
     opacity: 1 !important;
-    transform: scale(1) !important;
+    
     transition: opacity 0.4s ease 0.4s, transform 0.4s ease 0.4s !important;
 }
 
@@ -1329,21 +1329,21 @@ body:not(.editing) #works-grid .glass-card.carousel-side {
     filter: brightness(0.6);
     opacity: 0.85;
     /* Slightly smaller */
-    transform: scale(0.9) !important; 
+     
 }
 
 body:not(.editing) #works-grid .glass-card.carousel-back {
     filter: brightness(0.3);
     opacity: 0.6;
     /* Much smaller to look further away */
-    transform: scale(0.7) !important;
+    
 }
 
 /* --- ホバーでの枠はみ出し防止 ---
    アクティブではない星をホバーしても巨大化しないようにする */
 body:not(.editing) #works-grid .glass-card:not(.carousel-active):hover {
     width: 50px !important;
-    height: 50px !important;
+    /* removed height !important */
     /* 巨大化させず、少し輝かせるだけに留める */
     box-shadow: 0 0 20px #FFF, 0 0 50px rgba(255, 215, 0, 1) !important;
     background: rgba(255, 255, 255, 1) !important;
@@ -1353,4 +1353,21 @@ body:not(.editing) #works-grid .glass-card:not(.carousel-active):hover {
 body:not(.editing) #works-grid .glass-card:not(.carousel-active):hover > * {
     opacity: 0 !important;
     pointer-events: none !important;
+}
+
+
+body:not(.editing) #works-grid .glass-card:not(.carousel-active) {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    /* 星の中央からのブレをなくすため、marginも正しく指定 */
+    margin-top: -30px !important;
+    margin-left: -30px !important;
+}
+
+body:not(.editing) #works-grid .glass-card:not(.carousel-active):hover {
+    width: 70px !important;
+    height: 70px !important;
+    margin-top: -35px !important;
+    margin-left: -35px !important;
 }

@@ -303,15 +303,12 @@ function updateCarouselDisplay() {
                 let h = card.scrollHeight;
                 card.style.setProperty('--active-height', h + 'px');
                 
-                // カードの高さに余白(上下計120px程度)を足して、コンテナ枠自体を伸縮させる
-                grid.style.height = (h + 120) + 'px';
-                grid.style.minHeight = (h + 120) + 'px';
+                grid.style.height = (h + 160) + 'px';
+                grid.style.minHeight = (h + 160) + 'px';
                 
-                // Section自体の高さも必要に応じて更新（はみ出しを確実に防止）
                 const section = document.getElementById('works');
                 if(section) {
-                   section.style.minHeight = 'auto'; // フレックス等に任せる
-                   section.style.height = 'auto';
+                   section.style.minHeight = (h + 300) + 'px';
                 }
             }, 50);
         } else {
@@ -329,7 +326,17 @@ function updateCarouselDisplay() {
         }
         
         // JS Transform applied correctly using variables
-        card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px)`;
+        
+        let currentScale = 1.0;
+        if (numCards === 4) {
+            let diff = Math.abs(index - m_CarouselIndex);
+            if (diff === 1 || diff === 3) currentScale = 0.85;
+            if (diff === 2) currentScale = 0.6;
+        } else {
+            if (index !== m_CarouselIndex) currentScale = 0.8;
+        }
+        card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px) scale(${currentScale})`;
+    
 
         // 星をクリックした際、その星に回転するイベントを登録（初回のみ）
         if (!card.dataset.carouselClickRegistered) {
@@ -789,15 +796,12 @@ function initEditMode() {
                 let h = card.scrollHeight;
                 card.style.setProperty('--active-height', h + 'px');
                 
-                // カードの高さに余白(上下計120px程度)を足して、コンテナ枠自体を伸縮させる
-                grid.style.height = (h + 120) + 'px';
-                grid.style.minHeight = (h + 120) + 'px';
+                grid.style.height = (h + 160) + 'px';
+                grid.style.minHeight = (h + 160) + 'px';
                 
-                // Section自体の高さも必要に応じて更新（はみ出しを確実に防止）
                 const section = document.getElementById('works');
                 if(section) {
-                   section.style.minHeight = 'auto'; // フレックス等に任せる
-                   section.style.height = 'auto';
+                   section.style.minHeight = (h + 300) + 'px';
                 }
             }, 50);
                 } else {
