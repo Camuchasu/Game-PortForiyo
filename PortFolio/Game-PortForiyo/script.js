@@ -284,50 +284,61 @@ function updateCarouselDisplay() {
     if (!grid || m_IsEditMode || m_CarouselCards.length === 0) return;
 
     const numCards = m_CarouselCards.length;
+    const theta = 360 / numCards; 
+
+    // Find the height requirement for the active card to prevent frame overlap!
+    let maxNeededHeight = 500;
 
     m_CarouselCards.forEach((card, index) => {
-        let diff = (index - m_CarouselIndex) % numCards;
-        if (diff < 0) diff += numCards;
-
-        // クラスの付け外し（フロントのみアクティブ化）
-        if (diff === 0) {
+        let angle = index * theta;
+        
+        // Remove old positional classes
+        card.classList.remove('carousel-active', 'carousel-side', 'carousel-back');
+        
+        if (index === m_CarouselIndex) {
             card.classList.add('carousel-active');
+            // setTimeout to measure height after CSS applies width, 
+            // since CSS transition might be immediate to width 600px
+            setTimeout(() => {
+                if (card.scrollHeight > maxNeededHeight) {
+                    grid.style.minHeight = (card.scrollHeight + 80) + 'px';
+                }
+            }, 50);
         } else {
-            card.classList.remove('carousel-active');
+            let diff = Math.abs(index - m_CarouselIndex);
+            // In a 4-card system, diff=1 or diff=3 is SIDE. diff=2 is BACK.
+            if (numCards === 4) {
+                if (diff === 1 || diff === 3) {
+                    card.classList.add('carousel-side');
+                } else if (diff === 2) {
+                    card.classList.add('carousel-back');
+                }
+            } else {
+                card.classList.add('carousel-side');
+            }
         }
         
-        // --- ユーザーの指定画像（手前・両隣・一番後ろ）に基づく立体ビルボード配置 ---
-        // 常に正面（rotateY(0deg)）を向けつつ、Z軸とスケールで遠近感を出す
-        if (diff === 0) {
-            // 0: 一番手前（明るく、大きい）
-            card.style.transform = `translateZ(0px) scale(1) rotateY(0deg)`;
-            card.style.opacity = '1';
-            card.style.zIndex = '10';
-            card.style.filter = 'brightness(1)';
-        } else if (diff === 1) {
-            // 1: 右隣（少し遠く、暗め）
-            // カードが600px幅になることを考慮し、X軸を大きくずらす
-            card.style.transform = `translateX(300px) translateZ(-150px) scale(0.8) rotateY(0deg)`;
-            card.style.opacity = '0.6';
-            card.style.zIndex = '5';
-            card.style.filter = 'brightness(0.5)';
-        } else if (diff === numCards - 1) {
-            // 3(最後の要素): 左隣（少し遠く、暗め）
-            card.style.transform = `translateX(-300px) translateZ(-150px) scale(0.8) rotateY(0deg)`;
-            card.style.opacity = '0.6';
-            card.style.zIndex = '5';
-            card.style.filter = 'brightness(0.5)';
-        } else {
-            // 2(それ以外): 一番後ろ（さらに暗く、遠目）
-            card.style.transform = `translateX(0px) translateZ(-300px) scale(0.5) rotateY(0deg)`;
-            card.style.opacity = '0.3';
-            card.style.zIndex = '1';
-            card.style.filter = 'brightness(0.3)';
+        // JS Transform applied correctly using variables
+        card.style.transform = `rotateY(${angle}deg) translateZ(${m_CarouselRadius}px)`;
+
+        // 星をクリックした際、その星に回転するイベントを登録（初回のみ）
+        if (!card.dataset.carouselClickRegistered) {
+            card.addEventListener('click', (e) => {
+                if (!m_IsEditMode && !card.classList.contains('carousel-active')) {
+                    e.preventDefault(); // active以外のときはリンクや動画クリックを無効化
+                    let diffToGo = index - m_CarouselIndex;
+                    // 最短距離を計算
+                    if (diffToGo > numCards / 2) diffToGo -= numCards;
+                    if (diffToGo < -numCards / 2) diffToGo += numCards;
+                    rotateCarousel(diffToGo);
+                }
+            });
+            card.dataset.carouselClickRegistered = "true";
         }
     });
 
-    // コンテナ自体の回転は行わない（カードが常に前を向くように）
-    grid.style.transform = `translateZ(0px) rotateY(0deg)`;
+    // わずかに下向きに傾ける(-8度)ことで奥の星が前面のカードの上に浮かび上がって見えるようにする
+    grid.style.transform = `translateZ(${-m_CarouselRadius}px) rotateX(-8deg) rotateY(${-m_CarouselIndex * theta}deg)`;
 }
 
 function rotateCarousel(direction) {

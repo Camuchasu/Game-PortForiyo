@@ -1315,3 +1315,42 @@ body:not(.editing) #works-grid .glass-card.carousel-active {
         margin-left: -42.5vw !important; /* EXACTLY HALF OF 85vw WIDTH */
     }
 }
+
+
+/* ---------------------------------
+   3Dカルーセルの配置ごとの明度・遠近感
+--------------------------------- */
+body:not(.editing) #works-grid .glass-card.carousel-active {
+    filter: brightness(1) drop-shadow(0 0 30px rgba(255, 215, 0, 0.4));
+    opacity: 1;
+}
+
+body:not(.editing) #works-grid .glass-card.carousel-side {
+    filter: brightness(0.6);
+    opacity: 0.85;
+    /* Slightly smaller */
+    transform: scale(0.9) !important; 
+}
+
+body:not(.editing) #works-grid .glass-card.carousel-back {
+    filter: brightness(0.3);
+    opacity: 0.6;
+    /* Much smaller to look further away */
+    transform: scale(0.7) !important;
+}
+
+/* --- ホバーでの枠はみ出し防止 ---
+   アクティブではない星をホバーしても巨大化しないようにする */
+body:not(.editing) #works-grid .glass-card:not(.carousel-active):hover {
+    width: 50px !important;
+    height: 50px !important;
+    /* 巨大化させず、少し輝かせるだけに留める */
+    box-shadow: 0 0 20px #FFF, 0 0 50px rgba(255, 215, 0, 1) !important;
+    background: rgba(255, 255, 255, 1) !important;
+}
+
+/* ホバー時にテキストを表示させない（星のまま） */
+body:not(.editing) #works-grid .glass-card:not(.carousel-active):hover > * {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
