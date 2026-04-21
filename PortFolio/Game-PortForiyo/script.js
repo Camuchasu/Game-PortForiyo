@@ -300,8 +300,18 @@ function updateCarouselDisplay() {
             // setTimeout to measure height after CSS applies width, 
             // since CSS transition might be immediate to width 600px
             setTimeout(() => {
-                if (card.scrollHeight > maxNeededHeight) {
-                    grid.style.minHeight = (card.scrollHeight + 80) + 'px';
+                let h = card.scrollHeight;
+                card.style.setProperty('--active-height', h + 'px');
+                
+                // カードの高さに余白(上下計120px程度)を足して、コンテナ枠自体を伸縮させる
+                grid.style.height = (h + 120) + 'px';
+                grid.style.minHeight = (h + 120) + 'px';
+                
+                // Section自体の高さも必要に応じて更新（はみ出しを確実に防止）
+                const section = document.getElementById('works');
+                if(section) {
+                   section.style.minHeight = 'auto'; // フレックス等に任せる
+                   section.style.height = 'auto';
                 }
             }, 50);
         } else {
@@ -776,10 +786,20 @@ function initEditMode() {
 
                     // CSSのフェードイン直後に再生開始する
                     setTimeout(() => {
-                        cloneMedia.play().catch(error => {
-                            console.log("モーダル動画の再生エラー", error);
-                        });
-                    }, 50);
+                let h = card.scrollHeight;
+                card.style.setProperty('--active-height', h + 'px');
+                
+                // カードの高さに余白(上下計120px程度)を足して、コンテナ枠自体を伸縮させる
+                grid.style.height = (h + 120) + 'px';
+                grid.style.minHeight = (h + 120) + 'px';
+                
+                // Section自体の高さも必要に応じて更新（はみ出しを確実に防止）
+                const section = document.getElementById('works');
+                if(section) {
+                   section.style.minHeight = 'auto'; // フレックス等に任せる
+                   section.style.height = 'auto';
+                }
+            }, 50);
                 } else {
                     // 画像の場合はそのまま追加する
                     m_ModalBody.appendChild(cloneMedia);
